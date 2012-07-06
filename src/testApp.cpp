@@ -4,15 +4,12 @@
 void testApp::setup(){
 	ofBackground(0, 0, 0, 255);
 	ofSetBackgroundAuto(true);
-	//ofEnableAlphaBlending(); 
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofSetWindowTitle("biochemical molecule");
 	batang.loadFont("/Users/ari/Media/fonts/favorites/Batang.ttf", 9, true, true);
 	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 	ofSetVerticalSync(false);
 	manualAlpha = false;
-	
-	// listen on the given port
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
 	current_msg_string = 0;
@@ -59,10 +56,9 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // GL_SRC_ALPHA_SATURATE,GL_ONE     GL_SRC_ALPHA, GL_ONE
 	cam.begin();
-	ofFill();	
-	ofSetColor(0,0,0,10);
+	ofFill();
+	ofSetColor(0,0,0,1);
 	lastAtomPosition = ofVec3f(0,0,0);
 	lastAtomGroup = 0;
 	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
@@ -74,10 +70,15 @@ void testApp::draw(){
 			if (tempAlpha < 0) tempAlpha = 0;
 			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
 		}
-		ofSphere(atom->position, atom->displacement);
+		//ofVec3f tempPos = atom->position+(sin(((float)ofGetFrameNum()/60*atom->displacement/5))*atom->displacement/2);
+		ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
 
-		if (atom != atoms.begin() && atom->group != lastAtomGroup) {
-			ofSetColor(255,128,0,128+alpha);
+		if (atom != atoms.begin()) {
+			if (atom->group != lastAtomGroup) {
+				ofSetColor(255,128,0,128+alpha);
+			} else {
+				ofSetColor(128,255,0,96+alpha);
+			}
 			ofLine(lastAtomPosition,atom->position);
 		}
 		lastAtomPosition = atom->position;
@@ -114,28 +115,16 @@ void testApp::keyPressed(int key){
 }
 
 
+
 void testApp::lookAtMedian() {
 	float maxX, minX,maxY,minY,maxZ,minZ;
 	ofVec3f tempVector;
 	tempVector.zero();
 	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++) {
-		/*if (atom->position.x > maxX) maxX = atom->position.x;
-			if (atom->position.x > maxX) maxX = atom->position.x;
-			if (atom->position.x < minX) minX = atom->position.x;
-			if (atom->position.x > maxY) maxY = atom->position.y;
-			if (atom->position.x < minY) minY = atom->position.y;
-			if (atom->position.x > maxZ) maxZ = atom->position.z;
-			if (atom->position.x < minZ) minZ = atom->position.z;
-			*/
 		tempVector += atom->position;
 	}
-	//ofVec3f median = ofVec3f((maxX+minX)/2,(maxY+minY)/2,(maxZ+minZ)/2);
-	//median /= atoms.size();
-	//cout << median;
 	tempVector /= atoms.size();
-
 	cam.setTarget(tempVector);
-	//cam.lookAt(median);
 }
 
 

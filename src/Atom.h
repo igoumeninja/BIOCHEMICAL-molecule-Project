@@ -2,7 +2,7 @@
 
 class Atom {
 	public:
-		ofVec3f position;
+		ofVec3f position, initPosition;
 		float displacement;
 		string type, acid;
 		int id, group;
