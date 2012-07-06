@@ -1,7 +1,9 @@
 #pragma once
-
 #include "ofMain.h"
 #include "ofxOsc.h"
+#include "Atom.h"
+#include <list>
+using std::list;
 
 // listen on port 12345
 #define PORT 12345
@@ -24,7 +26,7 @@ class testApp : public ofBaseApp {
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-
+		void lookAtMedian();
 		ofTrueTypeFont batang;
 		ofxOscReceiver receiver;
 
@@ -37,10 +39,15 @@ class testApp : public ofBaseApp {
 	
 		ofEasyCam cam; // add mouse controls for camera movement
 	
-	int atomID,numAtoms;
+	int atomID,numAtoms, groupID;
 	string element[MAX_ELEMENTS];
-	float posX[MAX_ELEMENTS], posY[MAX_ELEMENTS], posZ[MAX_ELEMENTS];
-	float bIso[MAX_ELEMENTS];
-	string type_symbol[MAX_ELEMENTS];
+	float posX, posY, posZ;
+	float bIso;
+	string type_symbol, acid;
+	bool manualAlpha;
+	int alpha;
+	list<Atom> atoms;
+	ofVec3f lastAtomPosition;
+	int lastAtomGroup;
 
 };
