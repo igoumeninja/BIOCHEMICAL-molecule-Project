@@ -44,7 +44,8 @@ class testApp : public ofBaseApp {
 	float posX, posY, posZ;
 	float bIso;
 	string type_symbol, acid;
-
+	bool manualAlpha;
+	int alpha;
 	list<Atom> atoms;
 	ofVec3f lastAtomPosition;
 	int lastAtomGroup;

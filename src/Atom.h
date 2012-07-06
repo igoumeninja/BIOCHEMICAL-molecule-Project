@@ -9,6 +9,6 @@ class Atom {
 		Atom(int, ofVec3f, float, string, int, string);
 		Atom();
 		ofColor color;
-
-
+	private:
+		int transparency;
 };

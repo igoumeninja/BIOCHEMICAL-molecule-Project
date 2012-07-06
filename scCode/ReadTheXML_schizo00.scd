@@ -14,7 +14,7 @@ n.sendMsg("atomID", x[1].getText.asFloat, y[1].getText.asFloat, z[2].getText.asF
 //:-	
 (
 {
-	2600.do{|i|
+	2400.do{|i|
 		n.sendMsg(
 			"atomID", 
 			i.asInt, 
@@ -23,11 +23,11 @@ n.sendMsg("atomID", x[1].getText.asFloat, y[1].getText.asFloat, z[2].getText.asF
 			~zPos[i].getText.asFloat,
 			~bIso[i].getText.asFloat,
 			~type_symbol[i].getText.asString.postln,
-			~seQId[i].getText.asInt,
+			~seqId[i].getText.asInteger,
 			~compId[i].getText.asString
 			);			
 		//i.postln;
-		0.05.wait;
+		0.001.wait;
 	}
 }.fork
 )
