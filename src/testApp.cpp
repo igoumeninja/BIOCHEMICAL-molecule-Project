@@ -15,18 +15,14 @@ void testApp::setup(){
 	// listen on the given port
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
-
 	current_msg_string = 0;
 	mouseX = 0;
 	mouseY = 0;
 	mouseButtonState = "";
-
 	ofSetSphereResolution(4);
 	//ofEnableSmoothing();
 	ofEnablePointSprites();
-	
 	cam.setTarget(ofVec3f(173.082, 184.656, 177.797));
-
 }
 
 //--------------------------------------------------------------
@@ -90,7 +86,6 @@ void testApp::draw(){
 	cam.end();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
-
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	switch(key) {
