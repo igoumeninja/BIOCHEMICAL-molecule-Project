@@ -1,6 +1,7 @@
 /*
 2600 atoms
 */
+(
 d = DOMDocument("C:/Users/Schizoid/Desktop/extending/of_v0071_vs2010_release/apps/myApps/BIOCHEMICAL-molecule-Project/3SPX.xml");
 ~xPos = d.getElementsByTagName ("PDBx:Cartn_x");
 ~yPos = d.getElementsByTagName ("PDBx:Cartn_y");
@@ -9,6 +10,7 @@ d = DOMDocument("C:/Users/Schizoid/Desktop/extending/of_v0071_vs2010_release/app
 ~seqId = d.getElementsByTagName ("PDBx:auth_seq_id");
 ~compId = d.getElementsByTagName ("PDBx:label_comp_id"); 
 ~typeSymbol = d.getElementsByTagName ("PDBx:type_symbol");
+)
 n = NetAddr("127.0.0.1", 12345);
 n.sendMsg("atomID", x[1].getText.asFloat, y[1].getText.asFloat, z[2].getText.asFloat )
 //:-	
@@ -27,7 +29,7 @@ n.sendMsg("atomID", x[1].getText.asFloat, y[1].getText.asFloat, z[2].getText.asF
 			~compId[i].getText.asString
 			);			
 		//i.postln;
-		0.001.wait;
+		0.005.wait;
 	}
 }.fork
 )

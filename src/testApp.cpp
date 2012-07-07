@@ -20,10 +20,18 @@ void testApp::setup(){
 	//ofEnableSmoothing();
 	ofEnablePointSprites();
 	cam.setTarget(ofVec3f(173.082, 184.656, 177.797));
+
+	serial.listDevices();
+	serial.setup("COM3", 115200); // initialize com port
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
+
+	//read serial
+	readSerial();
+
+	//calculate alpha
 	alpha = (((float)ofGetMouseX()/(float)ofGetWidth())*128) -64;
 
 	// hide old messages
@@ -86,6 +94,49 @@ void testApp::draw(){
 	}
 	cam.end();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
+}
+
+void testApp::readSerial() {
+		int nRead  = 0; 
+		unsigned char bytesReturned[1];
+		char		bytesRead[1];				// data from serial, we will be trying to read 3
+		char		bytesReadString[2];			// a string needs a null terminator, so we need 3 + 1 bytes
+		memset(bytesReadString, 0, 2);
+		memset(bytesReturned, 0, 1);
+		while( (nRead = serial.readBytes( bytesReturned, 1)) > 0){
+			memcpy(bytesReadString, bytesReturned, 1);
+			if (ofToString(bytesReadString) != "\n") {
+				serialData += bytesReadString;
+			} else {
+				ofVec3f tempVec = calculateRotation(serialData);
+				cam.dolly(tempVec.x);
+				//cam.setGlobalPosition(tempVec);
+				//cam.setPosition(tempVec);
+				/*
+				cam.tilt(tempVec.x);
+				cam.pan(tempVec.y);
+				cam.roll(tempVec.z);
+				cout << tempVec << endl;
+				serialData = "";
+				*/
+			}
+		};
+}
+
+ofVec3f testApp::calculateRotation(string str) {
+	ofVec3f tempVec;
+	string tempString;
+	int tempPosition = str.find(":");
+	tempString = str.substr(tempPosition+1,str.size());
+	tempPosition = tempString.find(",");
+	tempVec.x = ofToFloat(tempString.substr(0,tempPosition));
+	tempString = tempString.substr(tempPosition+1,tempString.size());
+	tempPosition = tempString.find(",");
+	tempVec.y = ofToFloat(tempString.substr(0,tempPosition));
+	tempString = tempString.substr(tempPosition+1,tempString.size());
+	tempPosition = tempString.find(",");
+	tempVec.z = ofToFloat(tempString.substr(0,tempPosition));
+	return tempVec;
 }
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){

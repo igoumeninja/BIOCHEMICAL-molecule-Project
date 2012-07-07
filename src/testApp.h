@@ -27,6 +27,8 @@ class testApp : public ofBaseApp {
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void lookAtMedian();
+		void readSerial();
+		ofVec3f calculateRotation(string srt);
 		ofTrueTypeFont batang;
 		ofxOscReceiver receiver;
 
@@ -38,6 +40,10 @@ class testApp : public ofBaseApp {
 		string mouseButtonState;
 	
 		ofEasyCam cam; // add mouse controls for camera movement
+
+		// Serial stuff
+		string serialData;
+		ofSerial serial; // add serial capabilities
 	
 	int atomID,numAtoms, groupID;
 	string element[MAX_ELEMENTS];
