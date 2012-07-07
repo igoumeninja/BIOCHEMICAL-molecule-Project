@@ -39,8 +39,10 @@ class testApp : public ofBaseApp {
 		int mouseX, mouseY;
 		string mouseButtonState;
 	
-		ofEasyCam cam; // add mouse controls for camera movement
-
+		ofCamera cam; // add mouse controls for camera movement
+		ofVec3f rotation;
+		float distance;
+		ofVec3f medianVector;
 		// Serial stuff
 		string serialData;
 		ofSerial serial; // add serial capabilities
@@ -55,5 +57,9 @@ class testApp : public ofBaseApp {
 	list<Atom> atoms;
 	ofVec3f lastAtomPosition;
 	int lastAtomGroup;
+
+
+	// Shader Stuff
+	ofShader shader;
 
 };

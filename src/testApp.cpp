@@ -19,10 +19,12 @@ void testApp::setup(){
 	ofSetSphereResolution(4);
 	//ofEnableSmoothing();
 	ofEnablePointSprites();
-	cam.setTarget(ofVec3f(173.082, 184.656, 177.797));
-
+	cam.setGlobalPosition(ofVec3f(0, 0, 0));
+	
+	distance = 1000;
 	serial.listDevices();
 	serial.setup("COM3", 115200); // initialize com port
+	shader.load("shaders/noise.vert", "shaders/noise.frag");
 }
 
 //--------------------------------------------------------------
@@ -64,6 +66,14 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+		shader.begin();
+			//we want to pass in some varrying values to animate our type / color 
+			shader.setUniform1f("timeValX", ofGetElapsedTimef() * 0.1 );
+			shader.setUniform1f("timeValY", -ofGetElapsedTimef() * 0.18 );
+			
+			//we also pass in the mouse position 
+			//we have to transform the coords to what the shader is expecting which is 0,0 in the center and y axis flipped. 
+			shader.setUniform2f("mouse", mouseX - ofGetWidth()/2, ofGetHeight()/2-mouseY );
 	cam.begin();
 	ofFill();
 	ofSetColor(0,0,0,1);
@@ -93,6 +103,7 @@ void testApp::draw(){
 		lastAtomGroup = atom->group;
 	}
 	cam.end();
+	shader.end();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
@@ -108,17 +119,11 @@ void testApp::readSerial() {
 			if (ofToString(bytesReadString) != "\n") {
 				serialData += bytesReadString;
 			} else {
-				ofVec3f tempVec = calculateRotation(serialData);
-				cam.dolly(tempVec.x);
-				//cam.setGlobalPosition(tempVec);
-				//cam.setPosition(tempVec);
-				/*
-				cam.tilt(tempVec.x);
-				cam.pan(tempVec.y);
-				cam.roll(tempVec.z);
-				cout << tempVec << endl;
+				rotation = calculateRotation(serialData);
+				cam.orbit(rotation.z,rotation.y,distance);
+				cam.roll(rotation.x);
+				cout << rotation << endl;
 				serialData = "";
-				*/
 			}
 		};
 }
@@ -143,8 +148,8 @@ void testApp::keyPressed(int key){
 	switch(key) {
 		case 'M':
 		case 'm':
-			if(cam.getMouseInputEnabled()) cam.disableMouseInput();
-			else cam.enableMouseInput();
+			//if(cam.getMouseInputEnabled()) cam.disableMouseInput();
+			//else cam.enableMouseInput();
 			break;
 			
 		case 'F':
@@ -161,6 +166,8 @@ void testApp::keyPressed(int key){
 		case 'a':
 			manualAlpha = !manualAlpha;
 			break;
+
+						
 	}
 
 }
@@ -169,13 +176,17 @@ void testApp::keyPressed(int key){
 
 void testApp::lookAtMedian() {
 	float maxX, minX,maxY,minY,maxZ,minZ;
-	ofVec3f tempVector;
-	tempVector.zero();
+	medianVector.zero();
 	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++) {
-		tempVector += atom->position;
+		medianVector += atom->position;
 	}
-	tempVector /= atoms.size();
-	cam.setTarget(tempVector);
+	medianVector /= atoms.size();
+	cam.setGlobalPosition(medianVector);
+	cam.setPosition(medianVector);
+	//stageCenter.setPosition(medianVector);
+	//cam.setParent(stageCenter);
+	//cam.lookAt(stageCenter);
+	cout << medianVector << endl;
 }
 
 
@@ -191,7 +202,7 @@ void testApp::mouseMoved(int x, int y){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-
+	distance = x;
 }
 
 //--------------------------------------------------------------
