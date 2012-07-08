@@ -25,6 +25,7 @@ https://github.com/igoumeninja/BIOCHEMICAL-molecule-Project/network
 - [[http://creativecomputing.cc/p5libs/proxml/][ProXML]] library for Processing
 - [[http://www.w3schools.com/xml/xml_elements.asp][XML Elements]]
 - [[http://www.openframeworks.cc/documentation/gl/ofVbo.html][ofVbo]]
+- [[https://sites.google.com/site/xbeetutorial/xctu][X-CTU]] connect XBee to Arduino
 
 * Documentation
 ** <2012-07-06 Fri>
