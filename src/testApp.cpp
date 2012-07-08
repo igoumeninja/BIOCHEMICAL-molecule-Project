@@ -7,7 +7,7 @@ void testApp::setup(){
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofSetWindowTitle("biochemical molecule");
 	batang.loadFont("/Users/ari/Media/fonts/favorites/Batang.ttf", 9, true, true);
-	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
+	//ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 	ofSetVerticalSync(false);
 	manualAlpha = false;
 	cout << "listening for osc messages on port " << PORT << "\n";
@@ -66,7 +66,7 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-		shader.begin();
+		//shader.begin();
 			//we want to pass in some varrying values to animate our type / color 
 			shader.setUniform1f("timeValX", ofGetElapsedTimef() * 0.1 );
 			shader.setUniform1f("timeValY", -ofGetElapsedTimef() * 0.18 );
@@ -89,7 +89,8 @@ void testApp::draw(){
 			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
 		}
 		//ofVec3f tempPos = atom->position+(sin(((float)ofGetFrameNum()/60*atom->displacement/5))*atom->displacement/2);
-		ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
+		//ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
+		atom->draw();
 
 		if (atom != atoms.begin()) {
 			if (atom->group != lastAtomGroup) {
@@ -103,7 +104,7 @@ void testApp::draw(){
 		lastAtomGroup = atom->group;
 	}
 	cam.end();
-	shader.end();
+	//shader.end();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
