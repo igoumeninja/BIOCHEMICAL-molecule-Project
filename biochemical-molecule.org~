@@ -16,15 +16,11 @@
 * Info
 Ο κώδικας του project αναπτύσσεται στο github στη διεύθηνση : https://github.com/igoumeninja/BIOCHEMICAL-molecule-Project
 
-Οι αλλαγές στον κώδικα οπτικοποιούνται μέσω του github:
-https://github.com/igoumeninja/BIOCHEMICAL-molecule-Project/network
-
 * Other links
 
 - [[http://www.rcsb.org/pdb/explore/explore.do?structureId=1M7T][Solution Structure and Dynamics of the Human-Escherichia coli Thioredoxin Chimera: Insights into Thermodynamic Stability]]
 - [[http://creativecomputing.cc/p5libs/proxml/][ProXML]] library for Processing
 - [[http://www.w3schools.com/xml/xml_elements.asp][XML Elements]]
-- [[http://www.openframeworks.cc/documentation/gl/ofVbo.html][ofVbo]]
 
 * Documentation
 ** <2012-07-06 Fri>
