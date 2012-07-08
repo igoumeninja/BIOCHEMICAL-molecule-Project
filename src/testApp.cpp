@@ -23,7 +23,7 @@ void testApp::setup(){
 	
 	distance = 1000;
 	serial.listDevices();
-	serial.setup("COM3", 115200); // initialize com port
+	serial.setup("COM6", 115200); // initialize com port
 	shader.load("shaders/noise.vert", "shaders/noise.frag");
 }
 
@@ -59,7 +59,11 @@ void testApp::update(){
 			groupID		= m.getArgAsInt32(6);
 			acid		= m.getArgAsString(7);
 			atoms.push_back(Atom(atomID,ofVec3f(posX,posY,posZ),bIso,type_symbol,groupID,acid));
+		} else if (m.getAddress() == "zoom") {
+			distance = m.getArgAsInt32(0);
+			cout << distance << endl;
 		}
+
 	}
 }
 
@@ -89,8 +93,7 @@ void testApp::draw(){
 			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
 		}
 		//ofVec3f tempPos = atom->position+(sin(((float)ofGetFrameNum()/60*atom->displacement/5))*atom->displacement/2);
-		//ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
-		atom->draw();
+		ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
 
 		if (atom != atoms.begin()) {
 			if (atom->group != lastAtomGroup) {
@@ -121,9 +124,13 @@ void testApp::readSerial() {
 				serialData += bytesReadString;
 			} else {
 				rotation = calculateRotation(serialData);
-				cam.orbit(rotation.z,rotation.y,distance);
-				cam.roll(rotation.x);
-				cout << rotation << endl;
+				if (rotation.x != 0 && rotation.y != 0 && rotation.z !=0 &&
+					rotation.x < 180 && rotation.y <180 && rotation.z < 180 &&
+					rotation.x < -180 && rotation.y > -180 && rotation.z > -180){
+					cam.orbit(rotation.z,rotation.y,distance);
+					cam.roll(rotation.x);
+					cout << rotation << endl;
+				}
 				serialData = "";
 			}
 		};

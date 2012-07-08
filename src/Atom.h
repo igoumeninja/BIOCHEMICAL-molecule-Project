@@ -7,13 +7,9 @@ class Atom {
 		string type, acid;
 		int id, group;
 		ofColor color;
-		ofVbo vbo;
 
 		Atom(int, ofVec3f, float, string, int, string);
 		Atom();
-		ofVbo initVbo(ofVec3f center, float radius);
-		void draw();
-
 
 	private:
 		int transparency;
