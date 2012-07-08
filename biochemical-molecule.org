@@ -27,3 +27,9 @@
 #+begin_html
 <iframe width="420" height="315" src="http://www.youtube.com/embed/giVsxAj7S4A" frameborder="0" allowfullscreen></iframe>
 #+end_html
+** <2012-07-07 Sat>
+
+#+begin_html
+<iframe width="420" height="315" src="http://www.youtube.com/embed/UkSchI7T3mE" frameborder="0" allowfullscreen></iframe>
+
+#+end_html
