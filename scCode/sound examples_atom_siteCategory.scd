@@ -16,7 +16,7 @@ e[0].getNodeName
 /*
 2600 atoms
 */
-d = DOMDocument("/Users/ari/Dropbox/orgshared/sites/org/extending/projects/Stratos-Bichakis/media/3SPX.xml");
+d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMICAL-molecule-Project/3SPX.xml");
 ~xPos = d.getElementsByTagName ("PDBx:Cartn_x")
 ~yPos = d.getElementsByTagName ("PDBx:Cartn_y")
 ~zPos = d.getElementsByTagName ("PDBx:Cartn_z")
@@ -29,18 +29,33 @@ d = DOMDocument("/Users/ari/Dropbox/orgshared/sites/org/extending/projects/Strat
 (
 SynthDef(\saw, {|amp = 0.1, pan =0, freq = 400|
 	Out.ar(0, Pan2.ar(
-						LFSaw.ar(freq, 
+						LFTri.ar(freq, 
 						0, 
 						amp*EnvGen.kr(
 								Env.perc(amp/100, amp, 1, 4), doneAction: 2)),pan))
 }).send(s)
 )
 
+n = NetAddr("127.0.0.1", 12345);
+
 (
 {
 	
-	2600.do{|i|
+	2400.do{|i|
 		var amp, pan, freq, atomId, dist, seqId, compId;
+		
+		n.sendMsg(
+			"atomID", 
+			i.asInt, 
+			~xPos[i].getText.asFloat,
+			~yPos[i].getText.asFloat,
+			~zPos[i].getText.asFloat,
+			~bIso[i].getText.asFloat,
+			~typeSymbol[i].getText.asString.postln,
+			~seqId[i].getText.asInteger,
+			~compId[i].getText.asString
+			);		
+			
 		
 		compId = ~compId[i].getText.asString.postln;
 		seqId = ~seqId[i].getText.asInteger.postln;
@@ -66,7 +81,7 @@ SynthDef(\saw, {|amp = 0.1, pan =0, freq = 400|
 			pow((~xPos[i+1].getText.asFloat	- ~xPos[i].getText.asFloat),2) +
 			pow((~yPos[i+1].getText.asFloat	- ~yPos[i].getText.asFloat),2) + 
 			pow((~zPos[i+1].getText.asFloat	- ~zPos[i].getText.asFloat),2)));
-		dist = dist/10;
+		dist = dist/100;
 		dist.wait;
 		
 		
