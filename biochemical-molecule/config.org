@@ -1,0 +1,30 @@
+* preamble
+<div id="toc\>
+<a href=""></a>
+<a href="{{.}}/index.html">Home</a> |
+<a href="{{.}}/calendar.html">Calendar</a> |
+<a href="{{.}}/lectures/lectures.html">Lectures</a> |
+<a href="{{.}}/tutorials/tutorials.html">Tutorials, Workshops</a> |
+<a href="{{.}}/tools/tools.html">Tools</a> |
+<a href="{{.}}/projects/projects.html">Projects</a>
+</div>
+<div style = "position: absolute; top: 10px; left: 10px; ">
+ <FORM METHOD="POST" ACTION="/cgi-bin/search_engine.cgi"><INPUT TYPE="text" SIZE="20" NAME="keywords" MAXLENGTH="80"><INPUT TYPE="SUBMIT" VALUE="Search"></FORM> 
+</div>
+* section-numbers: nil
+* table-of-contents: nil
+* recursive: t
+* auto-preamble: t
+
+* style
+<link rel="stylesheet" href="{{.}}/css/org.css" type="text/css"/>
+* auto-index: t
+* table-of-contents: t
+* author: "Ioannis Zannos & Aris Bezas"
+* email:  "zannos AT gmail DOT com  & aribezas AT gmail DOT com"
+* link-about: "../"
+* link-up: "../sitemap.html"
+* link-home: "{{.}}/index.html"
+
+
+{{.}} ../

@@ -22,7 +22,7 @@ void testApp::setup(){
     // you can get this from the Arduino application or via command line
     // for OSX, in your terminal type "ls /dev/tty.*" to get a list of serial devices
 	//ard.connect("/dev/tty.usbmodemfd121", 57600);
-	ard.connect("/dev/tty.usbserial-A4001mkL", 57600);	
+	ard.connect("/dev/tty.usbserial-A8004IdQ", 57600);	
 	
 	
 	// listen for EInitialized notification. this indicates that
@@ -39,7 +39,12 @@ void testApp::setup(){
 void testApp::update(){
 
 	updateArduino();
-
+	ofxOscMessage m;
+	m.setAddress( "zoom" );
+	m.addIntArg( ofMap(ard.getAnalog(0), 700, 150, 0, 700));
+	sender.sendMessage( m );
+	
+	/*
 	tempZoom += ard.getAnalog(0);
 	
 	if (ofGetFrameNum()%5 == 0) {
@@ -48,12 +53,13 @@ void testApp::update(){
 		m.setAddress( "zoom" );
 		m.addIntArg( ofMap(tempZoom/5, 550, 150, 100, 500) );
 		sender.sendMessage( m );
-		tempZoom = 0;
 		
-		cout << tempZoom/5 << endl;
+		
+		cout << ofMap(tempZoom/5, 550, 150, 100, 500)  << endl;
+		tempZoom = 0;
 	}
-	
-	ard.sendDigital(13, ARD_HIGH);
+	*/
+	//ard.sendDigital(13, ARD_HIGH);
 	//cout << ard.getAnalog(0);
 }
 

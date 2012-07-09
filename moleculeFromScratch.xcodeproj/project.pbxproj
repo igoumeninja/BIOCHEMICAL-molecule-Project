@@ -20,6 +20,7 @@
 		0202E7FE15A485C10013847D /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0202E7E515A485C10013847D /* OscPrintReceivedElements.cpp */; };
 		0202E7FF15A485C10013847D /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0202E7E715A485C10013847D /* OscReceivedElements.cpp */; };
 		0202E80015A485C10013847D /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0202E7E915A485C10013847D /* OscTypes.cpp */; };
+		0269905A15AAE2EA0082058D /* Atom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0269905815AAE2EA0082058D /* Atom.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -102,6 +103,8 @@
 		0202E7E815A485C10013847D /* OscReceivedElements.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscReceivedElements.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.h; sourceTree = SOURCE_ROOT; };
 		0202E7E915A485C10013847D /* OscTypes.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscTypes.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.cpp; sourceTree = SOURCE_ROOT; };
 		0202E7EA15A485C10013847D /* OscTypes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = OscTypes.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.h; sourceTree = SOURCE_ROOT; };
+		0269905815AAE2EA0082058D /* Atom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Atom.cpp; sourceTree = "<group>"; };
+		0269905915AAE2EA0082058D /* Atom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Atom.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -324,6 +327,8 @@
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
+				0269905815AAE2EA0082058D /* Atom.cpp */,
+				0269905915AAE2EA0082058D /* Atom.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -436,6 +441,7 @@
 				0202E7FE15A485C10013847D /* OscPrintReceivedElements.cpp in Sources */,
 				0202E7FF15A485C10013847D /* OscReceivedElements.cpp in Sources */,
 				0202E80015A485C10013847D /* OscTypes.cpp in Sources */,
+				0269905A15AAE2EA0082058D /* Atom.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
