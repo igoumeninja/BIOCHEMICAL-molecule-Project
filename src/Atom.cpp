@@ -10,7 +10,7 @@ Atom::Atom(int i, ofVec3f pos, float disp, string ty, int gr, string a)
 	group = gr;
 	acid = a;
 	transparency = 255/(displacement+1);
-	tempTransparency = 255;
+	tempTransparency = 0;
 	if (type == "N") {
 		color = ofColor(255, 0, 0, transparency);
 	} else if (type == "C") {

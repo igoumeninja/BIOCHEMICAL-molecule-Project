@@ -21,16 +21,16 @@ void testApp::setup(){
 	previousDistance = 0;
 	serial.listDevices();
 	serial.setup("COM6", 57600); // initialize com port
-	//shader.load("shaders/noise.vert", "shaders/noise.frag");
+	shader.load("shaders/noise.vert", "shaders/noise.frag");
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
 
 	//read serial
-	//if (!manualRotation) {
+	if (!manualRotation) {
 		readSerial();
-	//}
+	}
 	if (lastAtom.id != nil) {
 		goToAtom(lastAtom);
 	}
@@ -49,7 +49,7 @@ void testApp::update(){
 			posX		=	ofMap(m.getArgAsFloat( 1 ), 100,200, -400 ,400);
 			posY		=	ofMap(m.getArgAsFloat( 2 ), -50, 50, -400 ,400);
 			posZ		=	ofMap(m.getArgAsFloat( 3 ), -30, 30, -400 ,400);
-			bIso		=	ofMap(m.getArgAsFloat( 4 ), 0, 50, 0 , 10);
+			bIso		=	ofMap(m.getArgAsFloat( 4 ), 0, 60, 0 , 10);
 			type_symbol	=	m.getArgAsString(5);
 			groupID		= m.getArgAsInt32(6);
 			acid		= m.getArgAsString(7);
@@ -70,12 +70,7 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	/*ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
-	ofFill();
-	ofRotateX(rotation.x);
-	ofRotateY(rotation.y);
-	ofRotateZ(rotation.z);
-	ofBox(50);*/
+	shader.begin();
 	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
 	ofFill();
 	ofRotateX(rotation.x);
@@ -89,8 +84,8 @@ void testApp::draw(){
 	lastAtomGroup = 0;
 	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
 		if (!manualAlpha){
-			if (atom->tempTransparency > atom->transparency){
-				atom->tempTransparency = atom->tempTransparency - 5;
+			if (atom->tempTransparency < atom->transparency){
+				atom->tempTransparency = atom->tempTransparency + 5;
 			}
 			ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
 		} else {
@@ -120,6 +115,7 @@ void testApp::draw(){
 		lastAtomGroup = atom->group;
 	}
 	ofPopMatrix();
+	shader.end();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
@@ -152,17 +148,19 @@ ofVec3f testApp::calculateRotation(string str) {
 	int tempPosition = str.find(":");
 	tempString = str.substr(tempPosition+1,str.size());
 	tempPosition = tempString.find(",");
-	tempVec.x = ofToFloat(tempString.substr(0,tempPosition));
-	tempString = tempString.substr(tempPosition+1,tempString.size());
-	tempPosition = tempString.find(",");
-	tempVec.y = ofToFloat(tempString.substr(0,tempPosition));
+	tempVec.x = -ofToFloat(tempString.substr(0,tempPosition));
 	tempString = tempString.substr(tempPosition+1,tempString.size());
 	tempPosition = tempString.find(",");
 	tempVec.z = ofToFloat(tempString.substr(0,tempPosition));
-	rotationX = smooth(tempVec.x,0.9,rotationX);
+	tempString = tempString.substr(tempPosition+1,tempString.size());
+	tempPosition = tempString.find(",");
+	tempVec.y = -ofToFloat(tempString.substr(0,tempPosition));
+	/*rotationX = smooth(tempVec.x,0.9,rotationX);
 	rotationY = smooth(tempVec.y,0.9,rotationY);
 	rotationZ = smooth(tempVec.z,0.9,rotationZ);
-	return ofVec3f(rotationX,rotationY,rotationZ);
+	return ofVec3f(rotationX,rotationY,rotationZ);*/
+	return ofVec3f(tempVec.x,tempVec.y,tempVec.z);
+	return tempVec;
 }
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
