@@ -52,44 +52,41 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 	// Determine the beginning of a new amino acid 
 		
 		if( i==0 ,{seqId.postln; compId.postln; atomId.postln;},
-				 {	if (seqId == ~seqId[i-1].getText.asInteger, 
+				 {
+					 
+			if (seqId == ~seqId[i-1].getText.asInteger, 
 					{atomId.postln;}, 
 					{							
 						// Determine the secondary structure
 
-/*
-{var seqId= 41;
-~sheetBeg.includes(seqId)
-}
-*/
 
 	
-	if( ~sheetBeg.includes(seqId), 
-				{"SheetBeginning".postln}
-			);
-		
-	if( ~sheetEnd.includes(seqId),
-				{"SheetEnd".postln;} 
-			);
-	
-	if( ~helixBeg.includes(seqId), 
-				{"HelixBeginning".postln;}
-			);
-		
-	if( ~helixEnd.includes(seqId),
-				{"HelixEnd".postln;}
-			);
-
+				if( ~sheetBeg.includes(seqId), 
+							{"SheetBeginning".postln}
+						);
+					
+				if( ~sheetEnd.includes(seqId),
+							{"SheetEnd".postln;} 
+						);
+				
+				if( ~helixBeg.includes(seqId), 
+							{"HelixBeginning".postln;}
+						);
+					
+				if( ~helixEnd.includes(seqId),
+							{"HelixEnd".postln;}
+						);
 			
-						seqId.postln; compId.postln; atomId.postln;}
-			
-);
+						
+									seqId.postln; compId.postln; atomId.postln;}
+						
+			);
 		};
 		);
 		
 	// Link atomSymbol with a frequency
 		
-	/*	switch (atomId,
+		switch (atomId,
 Ê Ê Ê Ê				"N", {freq = 800},
 				Ê Ê "C", {freq = 200},
 					"O", {freq = 600},
@@ -102,7 +99,10 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 		amp = ~bIso[i].getText.asFloat/100;
 		pan = ~xPos[i].getText.asFloat-200/1000;
 
-	*/	
+	
+		
+		
+		
 		
 		// Calculate the distance between two atoms			
 		dist = (sqrt(
@@ -110,7 +110,7 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 			pow((~yPos[i+1].getText.asFloat	- ~yPos[i].getText.asFloat),2) + 
 			pow((~zPos[i+1].getText.asFloat	- ~zPos[i].getText.asFloat),2)));
 		dist = dist/1000;
-		dist.wait;
+//		dist.wait;
 		
 		
 	}

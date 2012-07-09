@@ -42,6 +42,7 @@ class testApp : public ofBaseApp {
 		ofCamera cam; // add mouse controls for camera movement
 		ofVec3f rotation;
 		float distance;
+		float previousDistance;
 		ofVec3f medianVector;
 		// Serial stuff
 		string serialData;

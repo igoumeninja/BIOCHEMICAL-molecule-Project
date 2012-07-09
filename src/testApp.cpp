@@ -20,8 +20,8 @@ void testApp::setup(){
 	//ofEnableSmoothing();
 	ofEnablePointSprites();
 	cam.setGlobalPosition(ofVec3f(0, 0, 0));
-	
-	distance = 1000;
+	distance = 500;
+	previousDistance = 500;
 	serial.listDevices();
 	serial.setup("COM6", 115200); // initialize com port
 	shader.load("shaders/noise.vert", "shaders/noise.frag");
@@ -60,7 +60,14 @@ void testApp::update(){
 			acid		= m.getArgAsString(7);
 			atoms.push_back(Atom(atomID,ofVec3f(posX,posY,posZ),bIso,type_symbol,groupID,acid));
 		} else if (m.getAddress() == "zoom") {
-			distance = m.getArgAsInt32(0);
+			float tempDistance = m.getArgAsInt32(0);
+			if (distance < tempDistance) {
+			distance = previousDistance + tempDistance/10 ;
+			} else if (distance > tempDistance) {
+			distance = previousDistance - tempDistance/10 ;
+			}
+			previousDistance = distance;
+			cam.setPosition(cam.getX(),cam.getY(),distance);
 			cout << distance << endl;
 		}
 
