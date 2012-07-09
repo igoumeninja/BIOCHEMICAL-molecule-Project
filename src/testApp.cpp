@@ -180,7 +180,18 @@ void testApp::keyPressed(int key){
 
 }
 
+float testApp::smooth(float data, float filterVal, float smoothedData) {
+	if (filterVal > 1){
+		filterVal = .99;
+	}
+	else if (filterVal <= 0){
+		filterVal = 0;
+	}
 
+  filterVal = (data * (1 - filterVal)) + (smoothedData  *  filterVal);
+
+  return smoothedData;
+}
 
 void testApp::lookAtMedian() {
 	float maxX, minX,maxY,minY,maxZ,minZ;

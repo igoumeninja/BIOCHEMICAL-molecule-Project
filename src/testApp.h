@@ -46,7 +46,7 @@ class testApp : public ofBaseApp {
 		// Serial stuff
 		string serialData;
 		ofSerial serial; // add serial capabilities
-	
+		float smooth(float data, float smoothVal, float smoothedData);
 	int atomID,numAtoms, groupID;
 	string element[MAX_ELEMENTS];
 	float posX, posY, posZ;
