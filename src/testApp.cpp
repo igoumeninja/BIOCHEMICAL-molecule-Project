@@ -6,42 +6,37 @@ void testApp::setup(){
 	ofSetBackgroundAuto(true);
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofSetWindowTitle("biochemical molecule");
-	batang.loadFont("/Users/ari/Media/fonts/favorites/Batang.ttf", 9, true, true);
-	//ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
+	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 	ofSetVerticalSync(false);
+
 	manualAlpha = false;
+	manualRotation = true;
+
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
-	current_msg_string = 0;
-	mouseX = 0;
-	mouseY = 0;
-	mouseButtonState = "";
-	ofSetSphereResolution(4);
+	ofSetSphereResolution(8);
 	//ofEnableSmoothing();
-	ofEnablePointSprites();
-	cam.setGlobalPosition(ofVec3f(0, 0, 0));
-	distance = 500;
-	previousDistance = 500;
+	//camPosition = ofVec3f(ofGetWidth()/2, ofGetHeight()/2, -200);
+	distance = 0;
+	previousDistance = 0;
 	serial.listDevices();
-	serial.setup("COM6", 115200); // initialize com port
-	shader.load("shaders/noise.vert", "shaders/noise.frag");
+	serial.setup("COM6", 57600); // initialize com port
+	//shader.load("shaders/noise.vert", "shaders/noise.frag");
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
 
 	//read serial
-	readSerial();
+	//if (!manualRotation) {
+		readSerial();
+	//}
+	if (lastAtom.id != nil) {
+		goToAtom(lastAtom);
+	}
 
 	//calculate alpha
 	alpha = (((float)ofGetMouseX()/(float)ofGetWidth())*128) -64;
-
-	// hide old messages
-	for(int i = 0; i < NUM_MSG_STRINGS; i++){
-		if(timers[i] < ofGetElapsedTimef()){
-			msg_strings[i] = "";
-		}
-	}
 
 	// check for waiting messages
 	while(receiver.hasWaitingMessages()){
@@ -51,24 +46,22 @@ void testApp::update(){
 		if(m.getAddress() == "atomID"){
 			// both the arguments are int32's
 			atomID		=	m.getArgAsInt32 ( 0 );
-			posX		=	ofMap(m.getArgAsFloat( 1 ), 100,200, 0 ,ofGetWidth());
-			posY		=	ofMap(m.getArgAsFloat( 2 ), -50, 50, 0 ,ofGetHeight());
-			posZ		=	ofMap(m.getArgAsFloat( 3 ), -30, 30, 0 ,400);
+			posX		=	ofMap(m.getArgAsFloat( 1 ), 100,200, -400 ,400);
+			posY		=	ofMap(m.getArgAsFloat( 2 ), -50, 50, -400 ,400);
+			posZ		=	ofMap(m.getArgAsFloat( 3 ), -30, 30, -400 ,400);
 			bIso		=	ofMap(m.getArgAsFloat( 4 ), 0, 50, 0 , 10);
 			type_symbol	=	m.getArgAsString(5);
 			groupID		= m.getArgAsInt32(6);
 			acid		= m.getArgAsString(7);
-			atoms.push_back(Atom(atomID,ofVec3f(posX,posY,posZ),bIso,type_symbol,groupID,acid));
+			if (lastAtom.id  == nil) {
+				camPosition = ofVec3f(posX,posY,posZ);
+			}			
+			lastAtom = Atom(atomID,ofVec3f(posX,posY,posZ),bIso,type_symbol,groupID,acid);
+			atoms.push_back(lastAtom);
 		} else if (m.getAddress() == "zoom") {
 			float tempDistance = m.getArgAsInt32(0);
-			if (distance < tempDistance) {
-			distance = previousDistance + tempDistance/10 ;
-			} else if (distance > tempDistance) {
-			distance = previousDistance - tempDistance/10 ;
-			}
+			distance = smooth(tempDistance, 0.95, previousDistance);
 			previousDistance = distance;
-			cam.setPosition(cam.getX(),cam.getY(),distance);
-			cout << distance << endl;
 		}
 
 	}
@@ -77,45 +70,61 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-		//shader.begin();
-			//we want to pass in some varrying values to animate our type / color 
-			shader.setUniform1f("timeValX", ofGetElapsedTimef() * 0.1 );
-			shader.setUniform1f("timeValY", -ofGetElapsedTimef() * 0.18 );
-			
-			//we also pass in the mouse position 
-			//we have to transform the coords to what the shader is expecting which is 0,0 in the center and y axis flipped. 
-			shader.setUniform2f("mouse", mouseX - ofGetWidth()/2, ofGetHeight()/2-mouseY );
-	cam.begin();
+	/*ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
 	ofFill();
+	ofRotateX(rotation.x);
+	ofRotateY(rotation.y);
+	ofRotateZ(rotation.z);
+	ofBox(50);*/
+	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
+	ofFill();
+	ofRotateX(rotation.x);
+	ofRotateY(rotation.y);
+	ofRotateZ(rotation.z);
+	ofPushMatrix();
+	ofTranslate(-camPosition);
+	
 	ofSetColor(0,0,0,1);
 	lastAtomPosition = ofVec3f(0,0,0);
 	lastAtomGroup = 0;
 	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
 		if (!manualAlpha){
-			ofSetColor(atom->color);
+			if (atom->tempTransparency > atom->transparency){
+				atom->tempTransparency = atom->tempTransparency - 5;
+			}
+			ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
 		} else {
 			int tempAlpha = alpha + atom->color.a;
 			if (tempAlpha > 255) tempAlpha = 255;
 			if (tempAlpha < 0) tempAlpha = 0;
 			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
 		}
-		//ofVec3f tempPos = atom->position+(sin(((float)ofGetFrameNum()/60*atom->displacement/5))*atom->displacement/2);
-		ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
-
+		//ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
+		ofSphere(atom->position, atom->displacement*2);
 		if (atom != atoms.begin()) {
-			if (atom->group != lastAtomGroup) {
-				ofSetColor(255,128,0,128+alpha);
+			int tempAlpha;
+			if (manualAlpha) {
+				tempAlpha = alpha;
 			} else {
-				ofSetColor(128,255,0,96+alpha);
+				tempAlpha = 0;
 			}
-			ofLine(lastAtomPosition,atom->position);
+			if (atom->group != lastAtomGroup) {
+
+			//	ofSetColor(255,128,0,128+tempAlpha);
+			} else {
+				ofSetColor(128,255,0,96+tempAlpha);
+				ofLine(lastAtomPosition,atom->position);
+			}
 		}
 		lastAtomPosition = atom->position;
 		lastAtomGroup = atom->group;
 	}
-	cam.end();
-	//shader.end();
+	ofPopMatrix();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
+}
+
+void testApp::goToAtom(Atom atom) {
+	camPosition = ofVec3f(smooth(atom.position.x,0.99,camPosition.x),smooth(atom.position.y,0.99,camPosition.y),smooth(atom.position.z,0.99,camPosition.z));
 }
 
 void testApp::readSerial() {
@@ -131,13 +140,7 @@ void testApp::readSerial() {
 				serialData += bytesReadString;
 			} else {
 				rotation = calculateRotation(serialData);
-				if (rotation.x != 0 && rotation.y != 0 && rotation.z !=0 &&
-					rotation.x < 180 && rotation.y <180 && rotation.z < 180 &&
-					rotation.x < -180 && rotation.y > -180 && rotation.z > -180){
-					cam.orbit(rotation.z,rotation.y,distance);
-					cam.roll(rotation.x);
-					cout << rotation << endl;
-				}
+				cout << rotation << endl;
 				serialData = "";
 			}
 		};
@@ -156,54 +159,44 @@ ofVec3f testApp::calculateRotation(string str) {
 	tempString = tempString.substr(tempPosition+1,tempString.size());
 	tempPosition = tempString.find(",");
 	tempVec.z = ofToFloat(tempString.substr(0,tempPosition));
-	return tempVec;
+	rotationX = smooth(tempVec.x,0.9,rotationX);
+	rotationY = smooth(tempVec.y,0.9,rotationY);
+	rotationZ = smooth(tempVec.z,0.9,rotationZ);
+	return ofVec3f(rotationX,rotationY,rotationZ);
 }
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	switch(key) {
-		case 'M':
-		case 'm':
-			//if(cam.getMouseInputEnabled()) cam.disableMouseInput();
-			//else cam.enableMouseInput();
+		case 'R':
+		case 'r':
+			manualRotation = !manualRotation;
 			break;
+
 			
 		case 'F':
 		case 'f':
 			ofToggleFullscreen();
 			break;
 
-		case 'L':
-		case 'l':
-			lookAtMedian();
-			break;
-
 		case 'A':
 		case 'a':
 			manualAlpha = !manualAlpha;
 			break;
-
-						
 	}
-
 }
 
-
-
-void testApp::lookAtMedian() {
-	float maxX, minX,maxY,minY,maxZ,minZ;
-	medianVector.zero();
-	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++) {
-		medianVector += atom->position;
+float testApp::smooth(float data, float filterVal, float smoothedData) {
+	if (filterVal > 1){
+		filterVal = .99;
 	}
-	medianVector /= atoms.size();
-	cam.setGlobalPosition(medianVector);
-	cam.setPosition(medianVector);
-	//stageCenter.setPosition(medianVector);
-	//cam.setParent(stageCenter);
-	//cam.lookAt(stageCenter);
-	cout << medianVector << endl;
-}
+	else if (filterVal <= 0){
+		filterVal = 0;
+	}
 
+  smoothedData = (data * (1 - filterVal)) + (smoothedData  *  filterVal);
+
+  return smoothedData;
+}
 
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){
@@ -217,11 +210,13 @@ void testApp::mouseMoved(int x, int y){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-	distance = x;
+
+
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+
 }
 
 //--------------------------------------------------------------
