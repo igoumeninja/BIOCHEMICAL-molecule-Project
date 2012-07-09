@@ -39,7 +39,7 @@ class testApp : public ofBaseApp {
 		int mouseX, mouseY;
 		string mouseButtonState;
 	
-		ofCamera cam; // add mouse controls for camera movement
+		ofEasyCam cam; // add mouse controls for camera movement
 		ofVec3f rotation;
 		float rotationX;
 		float rotationY;
@@ -51,6 +51,10 @@ class testApp : public ofBaseApp {
 		string serialData;
 		ofSerial serial; // add serial capabilities
 		float smooth(float data, float smoothVal, float smoothedData);
+
+		void goToAtom(Atom atom);
+		ofVec3f camPosition;
+
 	int atomID,numAtoms, groupID;
 	string element[MAX_ELEMENTS];
 	float posX, posY, posZ;
@@ -59,9 +63,9 @@ class testApp : public ofBaseApp {
 	bool manualAlpha;
 	int alpha;
 	list<Atom> atoms;
+	Atom lastAtom;
 	ofVec3f lastAtomPosition;
 	int lastAtomGroup;
-
 
 	// Shader Stuff
 	ofShader shader;

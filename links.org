@@ -1,3 +1,6 @@
 * Hardware
 ** Arduino
 1. [[http://www.sparkfun.com/products/10736][Sparkfun 9DOF]]
+* Software 
+** Open Frameworks
+1. [[http://arduino.cc/playground/Main/Smooth][Smoothing Function by Paul Badger]]
