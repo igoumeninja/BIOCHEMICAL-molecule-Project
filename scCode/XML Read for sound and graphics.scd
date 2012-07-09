@@ -36,14 +36,16 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 ~atomSiteCat = d.getElementsByTagName ("PDBx:atom_site");      // Access the atom_siteCategory
 ~chemCompCat = d.getElementsByTagName ("PDBx:chem_comp");
 ~compWeight = ~chemCompCat.collect({|item, i| item.getElement("PDBx:formula_weight")});
-~compWeightMax = ~compWeight.maxItem({|item, i| item.getText.asFloat}).getText.asFloat
-~compWeightMin = ~compWeight.minItem({|item, i| item.getText.asFloat}).getText.asFloat
+~compWeightMax = ~compWeight.maxItem({|item, i| item.getText.asFloat}).getText.asFloat;
+~compWeightMin = ~compWeight.minItem({|item, i| item.getText.asFloat}).getText.asFloat;
 
 ~xPos = d.getElementsByTagName ("PDBx:Cartn_x");
 ~yPos = d.getElementsByTagName ("PDBx:Cartn_y");
 ~zPos = d.getElementsByTagName ("PDBx:Cartn_z");
 
 ~bIso = d.getElementsByTagName ("PDBx:B_iso_or_equiv");
+~bIsoMax = ~bIso.maxItem({|item, i| item.getText.asFloat}).getText.asFloat;
+~bIsoMin = ~bIso.minItem({|item, i| item.getText.asFloat}).getText.asFloat;
 ~typeSymbol = d.getElementsByTagName ("PDBx:type_symbol");
 ~seqId = d.getElementsByTagName ("PDBx:label_seq_id");
 ~compId = d.getElementsByTagName ("PDBx:label_comp_id");
@@ -57,8 +59,8 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 ~readFactor = 1
 ~key = 4;
 ~atomSynths = Array.newClear(~atomSiteCat.size);
-~sheetSynth = nil;
-~helixSynth = nil;
+~sheetSynth = nil; ~helixSynth = nil;
+~isSheet = 0; ~isHelix = 0;
 ~pan = 0;
 )
 
@@ -80,12 +82,16 @@ OSCresponder(nil, '/amp', { | time, resp, msg |
 
 (
 
-SynthDef(\atom, {|amp = 0.1, pan =0, freq = 400, index = 5, modamp = 5000, readFactor = 1, sheet = 0, helix = 0 |
-	Out.ar(0, Pan2.ar(
-						SinOsc.ar(freq+SinOsc.ar(freq*index, 0, modamp*amp), 
-						0, 
-						EnvGen.kr(
-								Env.sine(200*amp/(10.pow(readFactor)), amp/10), doneAction: 2)),pan))
+SynthDef(\atom, {|amp = 0.1, pan =0, freq = 400, index = 5, modamp = 2.5, readFactor = 1, sheet = 0, helix = 0 |
+	var op1, op2, op2_amp_env, op2_amp_lfo, op1_amp_env;
+	
+	op2_amp_env =  -300*sheet;
+	op2_amp_lfo = SinOsc.kr(1, 0, 1000*helix);
+	op2 = SinOsc.ar((freq*index), 0, modamp*(amp*2000)+op2_amp_lfo+op2_amp_env);
+	op1_amp_env = EnvGen.kr(Env.sine(200*amp/(10.pow(readFactor)), amp/10), doneAction: 2);
+	op1 = SinOsc.ar(freq+op2, 0, op1_amp_env);
+	Out.ar(0, Pan2.ar(op1, pan));
+												
 }).add;
 
 
@@ -103,14 +109,14 @@ SynthDef(\aminoAcid, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 
 SynthDef(\sheet, {|amp = 0.1, pan = 0|
 	Out.ar(0, Pan2.ar(
-						WhiteNoise.ar(amp*EnvGen.kr(Env([0, 1, 1, 0], [10, 1, 1], 4)
-								)),pan)
+						Resonz.ar(WhiteNoise.ar(amp*EnvGen.kr(Env([0, 1], [10], 4)
+								)), 3000, Line.kr(0.5, 0.01, 15 ) ),pan)
 							)
 		
 }).add;
 
 
-SynthDef(\helix, {|amp = 0.1, pan = 0|
+SynthDef(\helix, {|amp = 0.03, pan = 0|
 	Out.ar(0, Pan2.ar(
 						Resonz.ar(WhiteNoise.ar(amp*EnvGen.kr(Env([0, 1, 1, 0], [3, 10, 1], 4))), SinOsc.kr(1, 0, 1000, 2000), 0.1), pan)
 							)
@@ -220,7 +226,6 @@ SynthDef(\helix, {|amp = 0.1, pan = 0|
 				
 
 		
-		~atomSynths[i] = Synth(\atom, [\readFactor, ~readFactor, \amp, amp, \pan, ~pan, \freq, freq]);
 
 		
 
@@ -249,32 +254,33 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 	
 				if( ~sheetBeg.includes(seqId), 
 							{"SheetBeginning".postln;
-								
-							~sheetSynth = Synth(\sheet);	
-							~atomSynths[i].set(\modamp, 10000, \sheet, 1);
-								
-								}
+							~sheetSynth = Synth(\sheet);
+							~isSheet = 1;
+							}
 						);
 					
 				if( ~sheetEnd.includes(seqId),
 							{"SheetEnd".postln;
 							
 							~sheetSynth.free;
-							~atomSynths[i].set(\index, [5.03, 4.97], \sheet, 0 );	
+							~isSheet = 0;
 								} 
 						);
 				
 				if( ~helixBeg.includes(seqId), 
 							{"HelixBeginning".postln;
 							
-							~helixSynth = Synth(\helix);							~atomSynths[i].set(\index, 2, \helix, 1);
-	
+							~helixSynth = Synth(\helix);
+							~isHelix = 1;	
 								}
 						);
 					
 				if( ~helixEnd.includes(seqId),
 							{"HelixEnd".postln;
-							~helixSynth.free;									~atomSynths[i].set(\index, [5.03, 4.97], \helix, 0);									}
+							
+							~helixSynth.free;
+							~isHelix = 0;
+								}
 						);
 			
 						
@@ -284,7 +290,8 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 		};
 		);
 		
-	
+			~atomSynths[i] = Synth(\atom, [\readFactor, ~readFactor, \amp, amp, \pan, ~pan, \freq, freq, \sheet, ~isSheet, \helix, ~isHelix]);
+
 		
 		// Calculate the distance between two atoms			
 		dist = (sqrt(
