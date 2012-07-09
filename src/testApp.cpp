@@ -70,56 +70,56 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+	/*ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
+	ofFill();
+	ofRotateX(rotation.x);
+	ofRotateY(rotation.y);
+	ofRotateZ(rotation.z);
+	ofBox(50);*/
 	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
 	ofFill();
 	ofRotateX(rotation.x);
 	ofRotateY(rotation.y);
 	ofRotateZ(rotation.z);
-	ofBox(50);
-	//ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
-	//ofFill();
-	//ofRotateX(rotation.x);
-	//ofRotateY(rotation.y);
-	//ofRotateZ(rotation.z);
-	//ofPushMatrix();
-	//ofTranslate(-camPosition);
-	//
-	//ofSetColor(0,0,0,1);
-	//lastAtomPosition = ofVec3f(0,0,0);
-	//lastAtomGroup = 0;
-	//for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
-	//	if (!manualAlpha){
-	//		if (atom->tempTransparency > atom->transparency){
-	//			atom->tempTransparency = atom->tempTransparency - 5;
-	//		}
-	//		ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
-	//	} else {
-	//		int tempAlpha = alpha + atom->color.a;
-	//		if (tempAlpha > 255) tempAlpha = 255;
-	//		if (tempAlpha < 0) tempAlpha = 0;
-	//		ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
-	//	}
-	//	//ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
-	//	ofSphere(atom->position, atom->displacement*2);
-	//	if (atom != atoms.begin()) {
-	//		int tempAlpha;
-	//		if (manualAlpha) {
-	//			tempAlpha = alpha;
-	//		} else {
-	//			tempAlpha = 0;
-	//		}
-	//		if (atom->group != lastAtomGroup) {
+	ofPushMatrix();
+	ofTranslate(-camPosition);
+	
+	ofSetColor(0,0,0,1);
+	lastAtomPosition = ofVec3f(0,0,0);
+	lastAtomGroup = 0;
+	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
+		if (!manualAlpha){
+			if (atom->tempTransparency > atom->transparency){
+				atom->tempTransparency = atom->tempTransparency - 5;
+			}
+			ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
+		} else {
+			int tempAlpha = alpha + atom->color.a;
+			if (tempAlpha > 255) tempAlpha = 255;
+			if (tempAlpha < 0) tempAlpha = 0;
+			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
+		}
+		//ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
+		ofSphere(atom->position, atom->displacement*2);
+		if (atom != atoms.begin()) {
+			int tempAlpha;
+			if (manualAlpha) {
+				tempAlpha = alpha;
+			} else {
+				tempAlpha = 0;
+			}
+			if (atom->group != lastAtomGroup) {
 
-	//		//	ofSetColor(255,128,0,128+tempAlpha);
-	//		} else {
-	//			ofSetColor(128,255,0,96+tempAlpha);
-	//			ofLine(lastAtomPosition,atom->position);
-	//		}
-	//	}
-	//	lastAtomPosition = atom->position;
-	//	lastAtomGroup = atom->group;
-	//}
-	//ofPopMatrix();
+			//	ofSetColor(255,128,0,128+tempAlpha);
+			} else {
+				ofSetColor(128,255,0,96+tempAlpha);
+				ofLine(lastAtomPosition,atom->position);
+			}
+		}
+		lastAtomPosition = atom->position;
+		lastAtomGroup = atom->group;
+	}
+	ofPopMatrix();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
