@@ -6,24 +6,19 @@ void testApp::setup(){
 	ofSetBackgroundAuto(true);
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofSetWindowTitle("biochemical molecule");
-	batang.loadFont("/Users/ari/Media/fonts/favorites/Batang.ttf", 9, true, true);
 	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 	ofSetVerticalSync(false);
+
 	manualAlpha = false;
+	manualRotation = true;
+
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
-	current_msg_string = 0;
-	mouseX = 0;
-	mouseY = 0;
-	mouseButtonState = "";
-	ofSetSphereResolution(4);
+	ofSetSphereResolution(8);
 	//ofEnableSmoothing();
-	ofEnablePointSprites();
-	cam.setTarget(ofVec3f(0,0,0));
-	//cam.lookAt(ofVec3f(0,0,0));
-	distance = 200;
-	previousDistance = 200;
-	cam.setDistance(distance);
+	//camPosition = ofVec3f(ofGetWidth()/2, ofGetHeight()/2, -200);
+	distance = 0;
+	previousDistance = 0;
 	serial.listDevices();
 	serial.setup("COM6", 57600); // initialize com port
 	//shader.load("shaders/noise.vert", "shaders/noise.frag");
@@ -33,20 +28,15 @@ void testApp::setup(){
 void testApp::update(){
 
 	//read serial
-	readSerial();
-	if (lastAtom.id != 0) {
+	//if (!manualRotation) {
+		readSerial();
+	//}
+	if (lastAtom.id != nil) {
 		goToAtom(lastAtom);
 	}
 
 	//calculate alpha
 	alpha = (((float)ofGetMouseX()/(float)ofGetWidth())*128) -64;
-
-	// hide old messages
-	for(int i = 0; i < NUM_MSG_STRINGS; i++){
-		if(timers[i] < ofGetElapsedTimef()){
-			msg_strings[i] = "";
-		}
-	}
 
 	// check for waiting messages
 	while(receiver.hasWaitingMessages()){
@@ -56,20 +46,22 @@ void testApp::update(){
 		if(m.getAddress() == "atomID"){
 			// both the arguments are int32's
 			atomID		=	m.getArgAsInt32 ( 0 );
-			posX		=	ofMap(m.getArgAsFloat( 1 ), 100,200, -200 ,200);
-			posY		=	ofMap(m.getArgAsFloat( 2 ), -50, 50, -200 ,200);
-			posZ		=	ofMap(m.getArgAsFloat( 3 ), -30, 30, -200 ,200);
+			posX		=	ofMap(m.getArgAsFloat( 1 ), 100,200, -400 ,400);
+			posY		=	ofMap(m.getArgAsFloat( 2 ), -50, 50, -400 ,400);
+			posZ		=	ofMap(m.getArgAsFloat( 3 ), -30, 30, -400 ,400);
 			bIso		=	ofMap(m.getArgAsFloat( 4 ), 0, 50, 0 , 10);
 			type_symbol	=	m.getArgAsString(5);
 			groupID		= m.getArgAsInt32(6);
 			acid		= m.getArgAsString(7);
+			if (lastAtom.id  == nil) {
+				camPosition = ofVec3f(posX,posY,posZ);
+			}			
 			lastAtom = Atom(atomID,ofVec3f(posX,posY,posZ),bIso,type_symbol,groupID,acid);
 			atoms.push_back(lastAtom);
 		} else if (m.getAddress() == "zoom") {
 			float tempDistance = m.getArgAsInt32(0);
 			distance = smooth(tempDistance, 0.95, previousDistance);
 			previousDistance = distance;
-			cam.setDistance(distance);
 		}
 
 	}
@@ -78,41 +70,56 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	//cam.begin();
+	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
 	ofFill();
-	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,0);
-	ofPushMatrix();
-	ofTranslate(camPosition);
 	ofRotateX(rotation.x);
 	ofRotateY(rotation.y);
 	ofRotateZ(rotation.z);
-	ofSetColor(0,0,0,1);
-	lastAtomPosition = ofVec3f(0,0,0);
-	lastAtomGroup = 0;
-	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
-		if (!manualAlpha){
-			ofSetColor(atom->color);
-		} else {
-			int tempAlpha = alpha + atom->color.a;
-			if (tempAlpha > 255) tempAlpha = 255;
-			if (tempAlpha < 0) tempAlpha = 0;
-			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
-		}
-		ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
+	ofBox(50);
+	//ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
+	//ofFill();
+	//ofRotateX(rotation.x);
+	//ofRotateY(rotation.y);
+	//ofRotateZ(rotation.z);
+	//ofPushMatrix();
+	//ofTranslate(-camPosition);
+	//
+	//ofSetColor(0,0,0,1);
+	//lastAtomPosition = ofVec3f(0,0,0);
+	//lastAtomGroup = 0;
+	//for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
+	//	if (!manualAlpha){
+	//		if (atom->tempTransparency > atom->transparency){
+	//			atom->tempTransparency = atom->tempTransparency - 5;
+	//		}
+	//		ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
+	//	} else {
+	//		int tempAlpha = alpha + atom->color.a;
+	//		if (tempAlpha > 255) tempAlpha = 255;
+	//		if (tempAlpha < 0) tempAlpha = 0;
+	//		ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
+	//	}
+	//	//ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
+	//	ofSphere(atom->position, atom->displacement*2);
+	//	if (atom != atoms.begin()) {
+	//		int tempAlpha;
+	//		if (manualAlpha) {
+	//			tempAlpha = alpha;
+	//		} else {
+	//			tempAlpha = 0;
+	//		}
+	//		if (atom->group != lastAtomGroup) {
 
-		if (atom != atoms.begin()) {
-			if (atom->group != lastAtomGroup) {
-				ofSetColor(255,128,0,128+alpha);
-			} else {
-				ofSetColor(128,255,0,96+alpha);
-			}
-			ofLine(lastAtomPosition,atom->position);
-		}
-		lastAtomPosition = atom->position;
-		lastAtomGroup = atom->group;
-	}
-	//cam.end();
-	ofPopMatrix();
+	//		//	ofSetColor(255,128,0,128+tempAlpha);
+	//		} else {
+	//			ofSetColor(128,255,0,96+tempAlpha);
+	//			ofLine(lastAtomPosition,atom->position);
+	//		}
+	//	}
+	//	lastAtomPosition = atom->position;
+	//	lastAtomGroup = atom->group;
+	//}
+	//ofPopMatrix();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
@@ -133,8 +140,6 @@ void testApp::readSerial() {
 				serialData += bytesReadString;
 			} else {
 				rotation = calculateRotation(serialData);
-				//cam.orbit(rotation.z,rotation.y,distance);
-				//cam.roll(rotation.x);
 				cout << rotation << endl;
 				serialData = "";
 			}
@@ -162,20 +167,15 @@ ofVec3f testApp::calculateRotation(string str) {
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	switch(key) {
-		case 'M':
-		case 'm':
-			//if(cam.getMouseInputEnabled()) cam.disableMouseInput();
-			//else cam.enableMouseInput();
+		case 'R':
+		case 'r':
+			manualRotation = !manualRotation;
 			break;
+
 			
 		case 'F':
 		case 'f':
 			ofToggleFullscreen();
-			break;
-
-		case 'L':
-		case 'l':
-			lookAtMedian();
 			break;
 
 		case 'A':
@@ -198,21 +198,6 @@ float testApp::smooth(float data, float filterVal, float smoothedData) {
   return smoothedData;
 }
 
-void testApp::lookAtMedian() {
-	float maxX, minX,maxY,minY,maxZ,minZ;
-	medianVector.zero();
-	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++) {
-		medianVector += atom->position;
-	}
-	medianVector /= atoms.size();
-	cam.setTarget(medianVector);
-	//stageCenter.setPosition(medianVector);
-	//cam.setParent(stageCenter);
-	//cam.lookAt(stageCenter);
-	cout << medianVector << endl;
-}
-
-
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){
 
@@ -225,11 +210,13 @@ void testApp::mouseMoved(int x, int y){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-	distance = x;
+
+
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+
 }
 
 //--------------------------------------------------------------

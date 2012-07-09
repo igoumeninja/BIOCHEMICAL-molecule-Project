@@ -26,46 +26,42 @@ class testApp : public ofBaseApp {
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		void lookAtMedian();
 		void readSerial();
+		float smooth(float data, float smoothVal, float smoothedData);
+		void goToAtom(Atom atom);
 		ofVec3f calculateRotation(string srt);
-		ofTrueTypeFont batang;
+
+
 		ofxOscReceiver receiver;
 
-		int current_msg_string;
-		string msg_strings[NUM_MSG_STRINGS];
-		float timers[NUM_MSG_STRINGS];
-
-		int mouseX, mouseY;
-		string mouseButtonState;
-	
-		ofEasyCam cam; // add mouse controls for camera movement
 		ofVec3f rotation;
 		float rotationX;
 		float rotationY;
 		float rotationZ;
 		float distance;
 		float previousDistance;
-		ofVec3f medianVector;
 		// Serial stuff
 		string serialData;
 		ofSerial serial; // add serial capabilities
-		float smooth(float data, float smoothVal, float smoothedData);
 
-		void goToAtom(Atom atom);
 		ofVec3f camPosition;
 
 	int atomID,numAtoms, groupID;
-	string element[MAX_ELEMENTS];
 	float posX, posY, posZ;
 	float bIso;
 	string type_symbol, acid;
+
+	bool manualRotation;
+	bool leftMouseDown;
+	bool rightMouseDown;
 	bool manualAlpha;
 	int alpha;
+
 	list<Atom> atoms;
 	Atom lastAtom;
 	ofVec3f lastAtomPosition;
 	int lastAtomGroup;
+
 
 	// Shader Stuff
 	ofShader shader;
