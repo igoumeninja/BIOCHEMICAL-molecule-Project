@@ -45,12 +45,12 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 
 (
 (
-SynthDef(\tri, {|amp = 0.1, pan =0, freq = 400|
+SynthDef(\sin, {|amp = 0.1, pan =0, freq = 400, readFactor = 1|
 	Out.ar(0, Pan2.ar(
-						LFTri.ar(freq, 
+						SinOsc.ar(freq+SinOsc.ar(freq*5, 0, 5000*amp), 
 						0, 
 						EnvGen.kr(
-								Env.perc(amp/100, amp, amp, 4), doneAction: 2)),pan))
+								Env.sine(200*amp/(10.pow(readFactor)), amp/10), doneAction: 2)),pan))
 }).send(s)
 );
 
@@ -65,7 +65,7 @@ SynthDef(\tri, {|amp = 0.1, pan =0, freq = 400|
 		seqId = ~seqId[i].getText.asInteger;
 		atomSymbol = ~typeSymbol[i].getText.asString;
 		
-		/*	
+		
 		
 	// Determine the beginning of a new amino acid 
 		
@@ -102,80 +102,80 @@ SynthDef(\tri, {|amp = 0.1, pan =0, freq = 400|
 		};
 		);
 		
-		*/
+	
 		
 // Link atomId with a frequency
 		
-switch (atomId,
-"N", {freq = (40+14).midicps},
-"CA", {freq = (40+12).midicps},Ê Ê  
-"O", {freq = (40+16).midicps},
-"C", {freq =  (28+12).midicps},
-"S", {freq = (40+85).midicps},
-"P", {freq = (40+30).midicps},
-"CL", {freq = (40+35).midicps},
-"NA", {freq = (40+22).midicps},	
-
-"CB", {freq = (52+12).midicps},
-"CD", {freq = (52+12).midicps},
-"CE", {freq = (52+12).midicps},
-"CG", {freq = (64+12).midicps},
-"CZ", {freq = (52+12).midicps},
-"CZ2", {freq = (52+12).midicps},
-"CZ3", {freq = (52+12).midicps},
-"CD1", {freq = (52+12).midicps},
-"CD2", {freq = (52+12).midicps},
-"CE1", {freq = (52+12).midicps},
-"CE2", {freq = (52+12).midicps},
-"CE3", {freq = (52+12).midicps},
-"CG1", {freq = (52+12).midicps},
-"CG2", {freq = (52+12).midicps},
-"CH2", {freq = (52+12).midicps},
-"C2", {freq = (52+12).midicps},
-"C3", {freq = (52+12).midicps},
-"C4", {freq = (52+12).midicps},
-"C5", {freq = (52+12).midicps},
-"C6", {freq = (52+12).midicps},
-"C2nil", {freq = (52+12).midicps},
-"C3nil", {freq = (52+12).midicps},
-"C4nil", {freq = (52+12).midicps},
-"C5nil", {freq = (52+12).midicps},
-
-"NZ", {freq = (40+14).midicps},
-"N1", {freq = (40+14).midicps},
-"NE", {freq = (40+14).midicps},
-"NE1", {freq = (40+14).midicps},
-"NE2", {freq = (40+14).midicps},
-"ND1", {freq = (40+14).midicps},
-"ND2", {freq = (40+14).midicps},
-"NH1", {freq = (40+14).midicps},
-"NH2", {freq = (40+14).midicps},
-
-"O3", {freq = (40+16).midicps},
-"OG", {freq = (40+16).midicps},
-"OH", {freq = (40+16).midicps},
-"OG1", {freq = (40+16).midicps},
-"OG2", {freq = (40+16).midicps},
-"OD1", {freq = (40+16).midicps},
-"OD2", {freq = (40+16).midicps},
-"OE1", {freq = (40+16).midicps},
-"OE2", {freq = (40+16).midicps},
-"OP1", {freq = (40+16).midicps},
-"OP2", {freq = (40+16).midicps},
-"OP3", {freq = (40+16).midicps},
-"OP4", {freq = (40+16).midicps},
-
-"SD", {freq = (40+85).midicps},
-"SG", {freq = (40+85).midicps},
-
-		{freq = 2000; [atomId, compId].postln});
+	switch (atomId,
+			"N", {freq = (28+14.0067).midicps},
+			"CA", {freq = (40+12.0107).midicps},Ê Ê  
+			"O", {freq = (40+15.9994).midicps},
+			"C", {freq =  (28+12.0107).midicps},
+			"S", {freq = (16+32.065).midicps},
+			"P", {freq = (40+30.973762).midicps},
+			"CL", {freq = (40+35.453).midicps},
+			"NA", {freq = (40+22.98976928).midicps},	
+			
+			"CB", {freq = (16+12.0107).midicps},
+			"CD", {freq = (64+12.0107).midicps},
+			"CE", {freq = (52+12.0107).midicps},
+			"CG", {freq = (64+12.0107).midicps},
+			"CZ", {freq = (28+12.0107).midicps},
+			"CZ2", {freq = (40+12.0107).midicps},
+			"CZ3", {freq = (52+12.0107).midicps},
+			"CD1", {freq = (40+12.0107).midicps},
+			"CD2", {freq = (52+12.0107).midicps},
+			"CE1", {freq = (52+12.0107).midicps},
+			"CE2", {freq = (52+12.0107).midicps},
+			"CE3", {freq = (52+12.0107).midicps},
+			"CG1", {freq = (52+12.0107).midicps},
+			"CG2", {freq = (52+12.0107).midicps},
+			"CH2", {freq = (52+12.0107).midicps},
+			"C2", {freq = (52+12.0107).midicps},
+			"C3", {freq = (52+12.0107).midicps},
+			"C4", {freq = (52+12.0107).midicps},
+			"C5", {freq = (52+12.0107).midicps},
+			"C6", {freq = (52+12.0107).midicps},
+			"C2nil", {freq = (52+12.0107).midicps},
+			"C3nil", {freq = (52+12.0107).midicps},
+			"C4nil", {freq = (52+12.0107).midicps},
+			"C5nil", {freq = (52+12.0107).midicps},
+			
+			"NZ", {freq = (40+14.0067).midicps},
+			"N1", {freq = (40+14.0067).midicps},
+			"NE", {freq = (40+14.0067).midicps},
+			"NE1", {freq = (40+14.0067).midicps},
+			"NE2", {freq = (40+14.0067).midicps},
+			"ND1", {freq = (40+14.0067).midicps},
+			"ND2", {freq = (40+14.0067).midicps},
+			"NH1", {freq = (40+14.0067).midicps},
+			"NH2", {freq = (40+14.0067).midicps},
+			
+			"O3", {freq = (52+15.9994).midicps},
+			"OG", {freq = (52+15.9994).midicps},
+			"OH", {freq = (52+15.9994).midicps},
+			"OG1", {freq = (40+15.9994).midicps},
+			"OG2", {freq = (40+15.9994).midicps},
+			"OD1", {freq = (40+15.9994).midicps},
+			"OD2", {freq = (40+15.9994).midicps},
+			"OE1", {freq = (40+15.9994).midicps},
+			"OE2", {freq = (40+15.9994).midicps},
+			"OP1", {freq = (40+15.9994).midicps},
+			"OP2", {freq = (40+15.9994).midicps},
+			"OP3", {freq = (40+15.9994).midicps},
+			"OP4", {freq = (40+15.9994).midicps},
+			
+			"SD", {freq = (52+32.065).midicps},
+			"SG", {freq = (28+32.065).midicps},
+			
+					{freq = 2000; [atomId, compId].postln});
 
 		amp = ~bIso[i].getText.asFloat/100;
-		pan = ~xPos[i].getText.asFloat-200/1000;
+		pan = ~xPos[i].getText.asFloat-100/100;
 
 	
 		
-		Synth(\tri, [\amp, amp, \pan, pan, \freq, freq]);
+		Synth(\sin, [\readFactor, ~readFactor, \amp, amp, \pan, pan, \freq, freq]);
 
 		
 		
@@ -184,7 +184,7 @@ switch (atomId,
 			pow((~xPos[i+1].getText.asFloat	- ~xPos[i].getText.asFloat),2) +
 			pow((~yPos[i+1].getText.asFloat	- ~yPos[i].getText.asFloat),2) + 
 			pow((~zPos[i+1].getText.asFloat	- ~zPos[i].getText.asFloat),2)));
-		dist = dist/100;
+		dist = dist/(~readFactor*10);
 	dist.wait;
 		
 		
@@ -192,3 +192,6 @@ switch (atomId,
 }.fork
 )
 
+
+
+~readFactor = 1
