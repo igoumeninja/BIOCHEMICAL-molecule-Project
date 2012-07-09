@@ -43,24 +43,6 @@ void testApp::update(){
 	m.setAddress( "zoom" );
 	m.addIntArg( ofMap(ard.getAnalog(0), 700, 150, 0, 700));
 	sender.sendMessage( m );
-	
-	/*
-	tempZoom += ard.getAnalog(0);
-	
-	if (ofGetFrameNum()%5 == 0) {
-		
-		ofxOscMessage m;
-		m.setAddress( "zoom" );
-		m.addIntArg( ofMap(tempZoom/5, 550, 150, 100, 500) );
-		sender.sendMessage( m );
-		
-		
-		cout << ofMap(tempZoom/5, 550, 150, 100, 500)  << endl;
-		tempZoom = 0;
-	}
-	*/
-	//ard.sendDigital(13, ARD_HIGH);
-	//cout << ard.getAnalog(0);
 }
 
 //--------------------------------------------------------------

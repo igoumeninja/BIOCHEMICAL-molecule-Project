@@ -1,4 +1,3 @@
-#+TITLE: 
 #+AUTHOR: Χρηστος Κουτσουραδής, Στράτος Μπιχάκης, Άρης Μπέζας
 
 * Sonification and 3D model construction on a BIOCHEMICAL molecule 
@@ -14,6 +13,8 @@
 Σε δεύτερο επίπεδο η επεξεργασία και τροποποίηση των δεδομένων, μπορεί να προσφέρει στον ακροατή μία νέα "εμπειρική" σχέση με τη φύση, η οποία του είναι πιο οικεία. Η παρατήρηση μίας περίπλοκης δομής μπορεί, όταν συνδυαστεί με ένα ακουστικό σήμα, να γίνει πιο αντιληπτή.
 
 - [[http://www.rcsb.org/pdb/explore/explore.do?structureId=3spx][Crystal structure of O-Acetyl Serine Sulfhydrylase from Leishmania donovani]]
+
+Ο ιστόσελίδα του project βρίσκεται στο ιστότοπο του σεμηναρίου: http://extending.earlab.org/projects/Stratos-Bichakis/biochemical-molecule.html
 
 Πληροφορίες επίσης [[./media/Abstract.pdf][Abstract.pdf]].
 * Info
