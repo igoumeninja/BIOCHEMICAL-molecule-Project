@@ -23,8 +23,8 @@ void testApp::setup(){
 	distance = 500;
 	previousDistance = 500;
 	serial.listDevices();
-	serial.setup("COM6", 115200); // initialize com port
-	shader.load("shaders/noise.vert", "shaders/noise.frag");
+	serial.setup("COM6", 57600); // initialize com port
+	//shader.load("shaders/noise.vert", "shaders/noise.frag");
 }
 
 //--------------------------------------------------------------
@@ -51,9 +51,9 @@ void testApp::update(){
 		if(m.getAddress() == "atomID"){
 			// both the arguments are int32's
 			atomID		=	m.getArgAsInt32 ( 0 );
-			posX		=	ofMap(m.getArgAsFloat( 1 ), 100,200, 0 ,ofGetWidth());
-			posY		=	ofMap(m.getArgAsFloat( 2 ), -50, 50, 0 ,ofGetHeight());
-			posZ		=	ofMap(m.getArgAsFloat( 3 ), -30, 30, 0 ,400);
+			posX		=	ofMap(m.getArgAsFloat( 1 ), 100,200, -ofGetWidth()/2 ,ofGetWidth()/2);
+			posY		=	ofMap(m.getArgAsFloat( 2 ), -50, 50, -ofGetHeight()/2 ,ofGetHeight()/2);
+			posZ		=	ofMap(m.getArgAsFloat( 3 ), -30, 30, -200 ,200);
 			bIso		=	ofMap(m.getArgAsFloat( 4 ), 0, 50, 0 , 10);
 			type_symbol	=	m.getArgAsString(5);
 			groupID		= m.getArgAsInt32(6);
@@ -61,14 +61,10 @@ void testApp::update(){
 			atoms.push_back(Atom(atomID,ofVec3f(posX,posY,posZ),bIso,type_symbol,groupID,acid));
 		} else if (m.getAddress() == "zoom") {
 			float tempDistance = m.getArgAsInt32(0);
-			if (distance < tempDistance) {
-			distance = previousDistance + tempDistance/10 ;
-			} else if (distance > tempDistance) {
-			distance = previousDistance - tempDistance/10 ;
-			}
+			distance = smooth(tempDistance, 0.9, previousDistance);
 			previousDistance = distance;
-			cam.setPosition(cam.getX(),cam.getY(),distance);
-			cout << distance << endl;
+			//cam.setPosition(cam.getX(),cam.getY(),distance);
+			//cout << distance << endl;
 		}
 
 	}
@@ -77,14 +73,6 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-		//shader.begin();
-			//we want to pass in some varrying values to animate our type / color 
-			shader.setUniform1f("timeValX", ofGetElapsedTimef() * 0.1 );
-			shader.setUniform1f("timeValY", -ofGetElapsedTimef() * 0.18 );
-			
-			//we also pass in the mouse position 
-			//we have to transform the coords to what the shader is expecting which is 0,0 in the center and y axis flipped. 
-			shader.setUniform2f("mouse", mouseX - ofGetWidth()/2, ofGetHeight()/2-mouseY );
 	cam.begin();
 	ofFill();
 	ofSetColor(0,0,0,1);
@@ -114,7 +102,6 @@ void testApp::draw(){
 		lastAtomGroup = atom->group;
 	}
 	cam.end();
-	//shader.end();
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
@@ -131,13 +118,10 @@ void testApp::readSerial() {
 				serialData += bytesReadString;
 			} else {
 				rotation = calculateRotation(serialData);
-				if (rotation.x != 0 && rotation.y != 0 && rotation.z !=0 &&
-					rotation.x < 180 && rotation.y <180 && rotation.z < 180 &&
-					rotation.x < -180 && rotation.y > -180 && rotation.z > -180){
-					cam.orbit(rotation.z,rotation.y,distance);
-					cam.roll(rotation.x);
-					cout << rotation << endl;
-				}
+				cam.orbit(rotation.z,rotation.y,distance);
+				cam.roll(rotation.x);
+				cout << rotation << endl;
+				//}
 				serialData = "";
 			}
 		};
@@ -156,7 +140,10 @@ ofVec3f testApp::calculateRotation(string str) {
 	tempString = tempString.substr(tempPosition+1,tempString.size());
 	tempPosition = tempString.find(",");
 	tempVec.z = ofToFloat(tempString.substr(0,tempPosition));
-	return tempVec;
+	rotationX = smooth(tempVec.x,0.9,rotationX);
+	rotationY = smooth(tempVec.y,0.9,rotationY);
+	rotationZ = smooth(tempVec.z,0.9,rotationZ);
+	return ofVec3f(rotationX,rotationY,rotationZ);
 }
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
@@ -181,10 +168,7 @@ void testApp::keyPressed(int key){
 		case 'a':
 			manualAlpha = !manualAlpha;
 			break;
-
-						
 	}
-
 }
 
 float testApp::smooth(float data, float filterVal, float smoothedData) {
@@ -195,7 +179,7 @@ float testApp::smooth(float data, float filterVal, float smoothedData) {
 		filterVal = 0;
 	}
 
-  filterVal = (data * (1 - filterVal)) + (smoothedData  *  filterVal);
+  smoothedData = (data * (1 - filterVal)) + (smoothedData  *  filterVal);
 
   return smoothedData;
 }

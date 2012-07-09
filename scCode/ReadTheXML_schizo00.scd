@@ -2,7 +2,7 @@
 2600 atoms
 */
 (
-d = DOMDocument("C:/Users/Schizoid/Desktop/extending/of_v0071_vs2010_release/apbhps/myApps/BIOCHEMICAL-molecule-Project/3SPX.xml");
+d = DOMDocument("C:/Users/Schizoid/Desktop/extending/of_v0071_vs2010_release/apps/myApps/BIOCHEMICAL-molecule-Project/3SPX.xml");
 ~xPos = d.getElementsByTagName ("PDBx:Cartn_x");
 ~yPos = d.getElementsByTagName ("PDBx:Cartn_y");
 ~zPos = d.getElementsByTagName ("PDBx:Cartn_z");

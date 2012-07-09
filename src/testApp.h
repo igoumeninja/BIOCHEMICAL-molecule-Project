@@ -41,6 +41,9 @@ class testApp : public ofBaseApp {
 	
 		ofCamera cam; // add mouse controls for camera movement
 		ofVec3f rotation;
+		float rotationX;
+		float rotationY;
+		float rotationZ;
 		float distance;
 		float previousDistance;
 		ofVec3f medianVector;
