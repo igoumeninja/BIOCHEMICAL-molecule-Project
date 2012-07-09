@@ -21,16 +21,27 @@ e = d.getElementsByTagName ("PDBx:Cartn_x")
 e[0].getText
 e[0].getNodeName
 
+f = ~chemCompCat.collect({|item, i| item.getElement("PDBx:formula_weight")});
+f[0].getText
+
+
+
+
 */
 
 // Store the document in variable d
 
 d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMICAL-molecule-Project/3SPX.xml");
 ~atomSiteCat = d.getElementsByTagName ("PDBx:atom_site");      // Access the atom_siteCategory
+~chemCompCat = d.getElementsByTagName ("PDBx:chem_comp");
+~compWeight = ~chemCompCat.collect({|item, i| item.getElement("PDBx:formula_weight")});
+~compWeightMax = ~compWeight.maxItem({|item, i| item.getText.asFloat}).getText.asFloat
+~compWeightMin = ~compWeight.minItem({|item, i| item.getText.asFloat}).getText.asFloat
 
 ~xPos = d.getElementsByTagName ("PDBx:Cartn_x");
 ~yPos = d.getElementsByTagName ("PDBx:Cartn_y");
 ~zPos = d.getElementsByTagName ("PDBx:Cartn_z");
+
 ~bIso = d.getElementsByTagName ("PDBx:B_iso_or_equiv");
 ~typeSymbol = d.getElementsByTagName ("PDBx:type_symbol");
 ~seqId = d.getElementsByTagName ("PDBx:label_seq_id");
@@ -45,12 +56,30 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 ~readFactor = 1
 ~key = 4;
 ~atomSynths = Array.newClear(~atomSiteCat.size);
+~sheetSynth = nil;
+~helixSynth = nil;
+~pan = 0;
+
+
+~amplitudePoller = { 
+	SendReply.kr(Impulse.kr(10), '/amp', Mix.kr(Amplitude.kr(In.ar(0, 2))));
+}.play(RootNode(Server.default), addAction: \addToTail);
+
+
+
+OSCresponder(nil, '/amp', { | time, resp, msg | 
+//	msg[3].postln;
+	~amplitude = msg[3];
+//	NetAddr("192.168.1.64", 12345).sendMsg("/amp", msg[3]);
+}).add;
+
+
 
 (
 
-SynthDef(\fm, {|amp = 0.1, pan =0, freq = 400, readFactor = 1|
+SynthDef(\atom, {|amp = 0.1, pan =0, freq = 400, index = 5, modamp = 5000, readFactor = 1, sheet = 0, helix = 0 |
 	Out.ar(0, Pan2.ar(
-						SinOsc.ar(freq+SinOsc.ar(freq*5, 0, 5000*amp), 
+						SinOsc.ar(freq+SinOsc.ar(freq*index, 0, modamp*amp), 
 						0, 
 						EnvGen.kr(
 								Env.sine(200*amp/(10.pow(readFactor)), amp/10), doneAction: 2)),pan))
@@ -60,7 +89,7 @@ SynthDef(\fm, {|amp = 0.1, pan =0, freq = 400, readFactor = 1|
 
 
 
-SynthDef(\sine, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
+SynthDef(\aminoAcid, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 	Out.ar(0, Pan2.ar(
 						SinOsc.ar(freq+SinOsc.ar(freq*2.3, 0, 100*amp), 
 						0, 
@@ -69,12 +98,30 @@ SynthDef(\sine, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 		)
 }).add;
 
+SynthDef(\sheet, {|amp = 0.1, pan = 0|
+	Out.ar(0, Pan2.ar(
+						WhiteNoise.ar(amp*EnvGen.kr(Env([0, 1, 1, 0], [10, 1, 1], 4)
+								)),pan)
+							)
+		
+}).add;
+
+
+SynthDef(\helix, {|amp = 0.1, pan = 0|
+	Out.ar(0, Pan2.ar(
+						Resonz.ar(WhiteNoise.ar(amp*EnvGen.kr(Env([0, 1, 1, 0], [3, 10, 1], 4))), SinOsc.kr(1, 0, 1000, 2000), 0.1), pan)
+							)
+		
+}).add;
+
+Synth(\helix)
+
 
 )
 (
 {
 	~atomSiteCat.size.do{|i|
-		var amp, pan, freq, atomId, dist, seqId, compId, atomSymbol, atomSiteId, secStructBeg, secStructEnd;
+		var amp, freq, index, atomId, dist, seqId, compId, atomSymbol, atomSiteId, secStructBeg, secStructEnd, aminoWeight, aminoAmp;
 	
 		atomSiteId = ~atomSiteCat[i].getAttribute("id").asInteger;
 		atomId = ~atomId[i].getText.asString;
@@ -82,8 +129,10 @@ SynthDef(\sine, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 		seqId = ~seqId[i].getText.asInteger;
 		atomSymbol = ~typeSymbol[i].getText.asString;
 		
+
+		
+//Sound Synthesis
 		amp = ~bIso[i].getText.asFloat/100;
-		pan = ~xPos[i].getText.asFloat-100/100;
 
 	// Link atomId with a frequency
 		
@@ -154,7 +203,7 @@ SynthDef(\sine, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 				
 
 		
-		~atomSynths[i] = Synth(\fm, [\readFactor, ~readFactor, \amp, amp, \pan, pan, \freq, freq]);
+		~atomSynths[i] = Synth(\atom, [\readFactor, ~readFactor, \amp, amp, \pan, ~pan, \freq, freq]);
 
 		
 
@@ -166,7 +215,16 @@ SynthDef(\sine, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 					 
 			if (seqId == ~seqId[i-1].getText.asInteger, 
 					{atomId.postln;}, 
-					{	Synth(\sine);
+					{	
+					// Look for the Amino Acid weight
+
+aminoWeight = ~compWeight[~chemCompCat.detectIndex(
+				{| item, i | 
+				item.getAttributeNode("id").getNodeValue == compId})].getText.asFloat;
+
+aminoAmp = 0.3*aminoWeight/~compWeightMax;
+ 		
+Synth(\aminoAcid, [\amp, aminoAmp]);
 												
 						// Determine the secondary structure
 
@@ -175,22 +233,31 @@ SynthDef(\sine, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 				if( ~sheetBeg.includes(seqId), 
 							{"SheetBeginning".postln;
 								
-								
-							//	~atomSynths[i].set
+							~sheetSynth = Synth(\sheet);	
+							~atomSynths[i].set(\modamp, 10000, \sheet, 1);
 								
 								}
 						);
 					
 				if( ~sheetEnd.includes(seqId),
-							{"SheetEnd".postln;} 
+							{"SheetEnd".postln;
+							
+							~sheetSynth.free;
+							~atomSynths[i].set(\index, [5.03, 4.97], \sheet, 0 );	
+								} 
 						);
 				
 				if( ~helixBeg.includes(seqId), 
-							{"HelixBeginning".postln;}
+							{"HelixBeginning".postln;
+							
+							~helixSynth = Synth(\helix);							~atomSynths[i].set(\index, 2, \helix, 1);
+	
+								}
 						);
 					
 				if( ~helixEnd.includes(seqId),
-							{"HelixEnd".postln;}
+							{"HelixEnd".postln;
+							~helixSynth.free;									~atomSynths[i].set(\index, [5.03, 4.97], \helix, 0);									}
 						);
 			
 						
@@ -215,18 +282,27 @@ SynthDef(\sine, {|amp = 0.1, pan = 0, freq = 42, readFactor = 1|
 }.fork
 )
 
-
-
 ~readFactor = 1
 ~key = 4;
+
 
 /*
 
 To Do List
-
+me
 Helix - Sheet structures -----> FM parameters
-Amino Acids molecular weight -----> amplitude
+
 x,y,z ---------> panning
+
+
+
+with Chris
+
+Add senders to openFrameworks
+VRML with bonds
+
+
+
 
 
 */
