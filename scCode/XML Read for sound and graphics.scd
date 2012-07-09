@@ -30,7 +30,8 @@ f[0].getText
 */
 
 // Store the document in variable d
-
+n = NetAddr("10.10.10.134", 12345);
+(
 d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMICAL-molecule-Project/3SPX.xml");
 ~atomSiteCat = d.getElementsByTagName ("PDBx:atom_site");      // Access the atom_siteCategory
 ~chemCompCat = d.getElementsByTagName ("PDBx:chem_comp");
@@ -59,8 +60,10 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 ~sheetSynth = nil;
 ~helixSynth = nil;
 ~pan = 0;
+)
 
 
+(
 ~amplitudePoller = { 
 	SendReply.kr(Impulse.kr(10), '/amp', Mix.kr(Amplitude.kr(In.ar(0, 2))));
 }.play(RootNode(Server.default), addAction: \addToTail);
@@ -114,7 +117,7 @@ SynthDef(\helix, {|amp = 0.1, pan = 0|
 		
 }).add;
 
-Synth(\helix)
+)
 
 
 )
@@ -122,6 +125,20 @@ Synth(\helix)
 {
 	~atomSiteCat.size.do{|i|
 		var amp, freq, index, atomId, dist, seqId, compId, atomSymbol, atomSiteId, secStructBeg, secStructEnd, aminoWeight, aminoAmp;
+	
+	n.sendMsg(
+			"atomID", 
+			i.asInt, 
+			~xPos[i].getText.asFloat,
+			~yPos[i].getText.asFloat,
+			~zPos[i].getText.asFloat,
+			~bIso[i].getText.asFloat,
+			~typeSymbol[i].getText.asString.postln,
+			~seqId[i].getText.asInteger,
+			~compId[i].getText.asString
+			);			
+
+	
 	
 		atomSiteId = ~atomSiteCat[i].getAttribute("id").asInteger;
 		atomId = ~atomId[i].getText.asString;
@@ -284,25 +301,3 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 
 ~readFactor = 1
 ~key = 4;
-
-
-/*
-
-To Do List
-me
-Helix - Sheet structures -----> FM parameters
-
-x,y,z ---------> panning
-
-
-
-with Chris
-
-Add senders to openFrameworks
-VRML with bonds
-
-
-
-
-
-*/
