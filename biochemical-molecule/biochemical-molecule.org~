@@ -1,7 +1,10 @@
+#+TITLE: 
+#+AUTHOR: Χρηστος Κουτσουραδής, Στράτος Μπιχάκης, Άρης Μπέζας
+
 * Sonification and 3D model construction on a BIOCHEMICAL molecule 
 
 #+begin_Center
-[[./media/1m7t.png]]
+[[./media/3SPX.png]]
 #+end_center
 
 Ένα Βιοχημικό μόριο είναι σε θέση να μας προσφέρει μία πληθώρα δεδομένων, τα οποία αφενώς μπορούν να χρησιμοποιηθούν αυτούσια (για την κατασκευή ένός γλυπτού ή ενός 3D μοντέλου) , αφετέρου κατόπιν προσεκτικής ανάγνωσης και χρησιμοποιώντας "μεταφορές" ,οι οποίες είναι θέμα αποφάσεων του καλλιτέχνη μπορούν να γίνουν δεδομένα άλλης φύσης, για παράδειγμα για την ηχητικοποίηση τους.
@@ -10,9 +13,47 @@
 
 Σε δεύτερο επίπεδο η επεξεργασία και τροποποίηση των δεδομένων, μπορεί να προσφέρει στον ακροατή μία νέα "εμπειρική" σχέση με τη φύση, η οποία του είναι πιο οικεία. Η παρατήρηση μίας περίπλοκης δομής μπορεί, όταν συνδυαστεί με ένα ακουστικό σήμα, να γίνει πιο αντιληπτή.
 
-- [[http://www.rcsb.org/pdb/explore/explore.do?structureId=1M7T][Solution Structure and Dynamics of the Human-Escherichia coli Thioredoxin Chimera: Insights into Thermodynamic Stability]]
 - [[http://www.rcsb.org/pdb/explore/explore.do?structureId=3spx][Crystal structure of O-Acetyl Serine Sulfhydrylase from Leishmania donovani]]
-- [[http://creativecomputing.cc/p5libs/proxml/][ProXML]] library for Processing
 
+Πληροφορίες επίσης [[./media/Abstract.pdf][Abstract.pdf]].
+* Info
+Ο κώδικας του project αναπτύσσεται στο github στη διεύθηνση : https://github.com/igoumeninja/BIOCHEMICAL-molecule-Project
+
+Οι αλλαγές στον κώδικα οπτικοποιούνται μέσω του github:
+https://github.com/igoumeninja/BIOCHEMICAL-molecule-Project/network
+
+Πληροφορίες μπορείται να βρείτε επίσης στο trello:
+https://trello.com/card/sonification-and-3d-model-construction-on-a-biochemical-molecule-project/4ff19de919fcdd257aa863c4/3
+
+* Other links
+
+- [[http://www.rcsb.org/pdb/explore/explore.do?structureId=1M7T][Solution Structure and Dynamics of the Human-Escherichia coli Thioredoxin Chimera: Insights into Thermodynamic Stability]]
+- [[http://creativecomputing.cc/p5libs/proxml/][ProXML]] library for Processing
 - [[http://www.w3schools.com/xml/xml_elements.asp][XML Elements]]
+- [[http://www.openframeworks.cc/documentation/gl/ofVbo.html][ofVbo]]
+- [[https://sites.google.com/site/xbeetutorial/xctu][X-CTU]] connect XBee to Arduino
+
+* Setup
+Η εγκατάσταση αποτελείται απο τον παρακάτω εξοπλισμό
+- 3 υπολογιστές οι οποίοι θα επικοινωνούν ασύρματα μέσω του πρωτοκόλλου OSC
+- Projector
+- Κάρτα ήχου
+- [[http://www.sparkfun.com/products/10736][Sparkfun 9DOF]]
+- Arduino with Infrared Proximity Sensor
+* Documentation
+** <2012-07-06 Fri>
+#+begin_html
+<iframe width="420" height="315" src="http://www.youtube.com/embed/giVsxAj7S4A" frameborder="0" allowfullscreen></iframe>
+#+end_html
+** <2012-07-07 Sat>
+
+#+begin_html
+<iframe width="420" height="315" src="http://www.youtube.com/embed/UkSchI7T3mE" frameborder="0" allowfullscreen></iframe>
+
+#+end_html
+** <2012-07-09 Mon>
+
+#+begin_html
+<iframe width="100%" height="166" scrolling="no" frameborder="no" src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F52217440&show_artwork=true"></iframe>
+#+end_html
 

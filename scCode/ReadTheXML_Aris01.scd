@@ -2,7 +2,7 @@
 2600 atoms
 */
 (
-d = DOMDocument("/Users/ari/Tools/openFrameworks/repository/of_0071_osx_release/apps/myApps/molecule/3SPX.xml");
+d = DOMDocument("/Users/ari/Tools/openFrameworks/repository/of_0071_osx_release/apps/myApps/molecule/data/3SPX.xml");
 ~xPos = d.getElementsByTagName ("PDBx:Cartn_x");
 ~yPos = d.getElementsByTagName ("PDBx:Cartn_y");
 ~zPos = d.getElementsByTagName ("PDBx:Cartn_z");

@@ -5,8 +5,8 @@ void testApp::setup(){
 	ofBackground(0, 0, 0, 255);
 	ofSetBackgroundAuto(true);
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
-	ofSetWindowTitle("biochemical molecule");
-	batang.loadFont("/Users/ari/Media/fonts/favorites/Batang.ttf", 9, true, true);
+	ofSetWindowTitle("Biochemical Molecule audio-visual presentation");	
+	batang.loadFont("../../../molecule/data/Batang.ttf", 9, true, true);
 	//ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 	ofSetVerticalSync(false);
 	manualAlpha = false;
@@ -17,21 +17,16 @@ void testApp::setup(){
 	mouseY = 0;
 	mouseButtonState = "";
 	ofSetSphereResolution(4);
-	//ofEnableSmoothing();
+	ofEnableSmoothing();
 	ofEnablePointSprites();
 	cam.setGlobalPosition(ofVec3f(0, 0, 0));
 	distance = 500;
 	previousDistance = 500;
-	serial.listDevices();
-	serial.setup("COM6", 115200); // initialize com port
-	shader.load("shaders/noise.vert", "shaders/noise.frag");
+	shader.load("../../../molecule/data/shaders/noise.vert", "../../../molecule/data/shaders/noise.frag");
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-
-	//read serial
-	readSerial();
 
 	//calculate alpha
 	alpha = (((float)ofGetMouseX()/(float)ofGetWidth())*128) -64;
@@ -77,14 +72,15 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-		//shader.begin();
-			//we want to pass in some varrying values to animate our type / color 
-			shader.setUniform1f("timeValX", ofGetElapsedTimef() * 0.1 );
-			shader.setUniform1f("timeValY", -ofGetElapsedTimef() * 0.18 );
-			
-			//we also pass in the mouse position 
-			//we have to transform the coords to what the shader is expecting which is 0,0 in the center and y axis flipped. 
-			shader.setUniform2f("mouse", mouseX - ofGetWidth()/2, ofGetHeight()/2-mouseY );
+	//shader.begin();
+	//we want to pass in some varrying values to animate our type / color 
+	shader.setUniform1f("timeValX", ofGetElapsedTimef() * 0.1 );
+	shader.setUniform1f("timeValY", -ofGetElapsedTimef() * 0.18 );
+	
+	//we also pass in the mouse position 
+	//we have to transform the coords to what the shader is expecting which is 0,0 in the center and y axis flipped. 
+	shader.setUniform2f("mouse", mouseX - ofGetWidth()/2, ofGetHeight()/2-mouseY );
+
 	cam.begin();
 	ofFill();
 	ofSetColor(0,0,0,1);
@@ -115,10 +111,10 @@ void testApp::draw(){
 	}
 	cam.end();
 	//shader.end();
-	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
+	//ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
-void testApp::readSerial() {
+/* void testApp::readSerial() {
 		int nRead  = 0; 
 		unsigned char bytesReturned[1];
 		char		bytesRead[1];				// data from serial, we will be trying to read 3
@@ -141,7 +137,7 @@ void testApp::readSerial() {
 				serialData = "";
 			}
 		};
-}
+}  
 
 ofVec3f testApp::calculateRotation(string str) {
 	ofVec3f tempVec;
@@ -158,13 +154,16 @@ ofVec3f testApp::calculateRotation(string str) {
 	tempVec.z = ofToFloat(tempString.substr(0,tempPosition));
 	return tempVec;
 }
+ 
+*/
+
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	switch(key) {
 		case 'M':
 		case 'm':
-			//if(cam.getMouseInputEnabled()) cam.disableMouseInput();
-			//else cam.enableMouseInput();
+//			if(cam.getMouseInputEnabled()) cam.disableMouseInput();
+//			else cam.enableMouseInput();
 			break;
 			
 		case 'F':
@@ -213,6 +212,9 @@ void testApp::keyReleased(int key){
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y){
 
+	cam.orbit(ofGetMouseX(),ofGetMouseY(),distance);
+
+
 }
 
 //--------------------------------------------------------------
@@ -222,6 +224,7 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+	cam.roll(ofGetMouseX());
 }
 
 //--------------------------------------------------------------
