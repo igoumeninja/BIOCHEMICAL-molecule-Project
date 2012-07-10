@@ -30,6 +30,9 @@ void testApp::update(){
 	//read serial
 	if (!manualRotation) {
 		readSerial();
+	} else {
+		rotation.y = smooth(360*sin((float)ofGetFrameNum()/2000),0.5,rotation.y);
+		rotation.x = smooth(180*cos((float)ofGetFrameNum()/3000),0.5,rotation.x);
 	}
 	if (lastAtom.id != nil) {
 		goToAtom(lastAtom);
@@ -62,6 +65,13 @@ void testApp::update(){
 			float tempDistance = m.getArgAsInt32(0);
 			distance = smooth(tempDistance, 0.95, previousDistance);
 			previousDistance = distance;
+		} else if (m.getAddress() == "manualmode") {
+			int tempManMode = m.getArgAsInt32(0);
+			if (tempManMode == 0) {
+				manualRotation = false;
+			} else {
+				manualRotation = true;
+			}
 		}
 
 	}
