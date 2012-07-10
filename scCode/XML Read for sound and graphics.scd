@@ -278,7 +278,7 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 							
 							~helixSynth = Synth(\helix);
 							~isHelix = 1;	
-							n.sendMsg("isSheet", ~isHelix);
+							n.sendMsg("isHelix", ~isHelix);
 								}
 						);
 					
@@ -287,7 +287,7 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 							
 							~helixSynth.free;
 							~isHelix = 0;
-							n.sendMsg("isSheet", ~isHelix);
+							n.sendMsg("isHelix", ~isHelix);
 
 								}
 						);

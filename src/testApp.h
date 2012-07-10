@@ -55,6 +55,8 @@ class testApp : public ofBaseApp {
 	bool leftMouseDown;
 	bool rightMouseDown;
 	bool manualAlpha;
+	int helix;
+	int sheet;
 	int alpha;
 
 	list<Atom> atoms;

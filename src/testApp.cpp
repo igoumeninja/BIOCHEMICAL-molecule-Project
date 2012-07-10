@@ -11,6 +11,8 @@ void testApp::setup(){
 
 	manualAlpha = false;
 	manualRotation = true;
+	sheet = 0;
+	helix = 0;
 
 	cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
@@ -78,6 +80,18 @@ void testApp::update(){
 			} else {
 				manualRotation = true;
 			}
+		} else if (m.getAddress() == "isSheet") {
+			if (m.getArgAsInt32(0) == 1) {
+				sheet = 1;
+			} else {
+				sheet = 0;
+			}
+		} else if (m.getAddress() == "isHelix") {
+			if (m.getArgAsInt32(0) == 1) {
+				helix = 1;
+			} else {
+				helix = 0;
+			}
 		}
 
 	}
@@ -143,7 +157,10 @@ void testApp::draw(){
 		shader.begin();
 			shader.setUniformTexture("tex0", texture, 1);
 			shader.setUniform2f("resolution", 1366 ,768);
-			shader.setUniform1f("time", ofGetElapsedTimef());
+			shader.setUniform1i("dissolution", ofRandom(0,5));
+			shader.setUniform1f("time", (1 + (helix*2) + (sheet*2)));
+			shader.setUniform1i("transpose", sheet);
+			//cout << (float)ofGetMouseY()/100 << endl;
 			glBegin(GL_QUADS);  
 				glTexCoord2f(0, 0); glVertex3f(0, 0, 0);  
 				glTexCoord2f(1366, 0); glVertex3f(1366, 0, 0);  
@@ -214,6 +231,12 @@ void testApp::keyPressed(int key){
 		case 'a':
 			manualAlpha = !manualAlpha;
 			break;
+
+		case 'C':
+		case 'c':
+			for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++) {
+				atom = atoms.erase(atom);
+			}
 	}
 }
 
