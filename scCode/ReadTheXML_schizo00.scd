@@ -35,8 +35,8 @@ n = NetAddr("127.0.0.1", 12345);
 			pow((~yPos[i+1].getText.asFloat	- ~yPos[i].getText.asFloat),2) + 
 			pow((~zPos[i+1].getText.asFloat	- ~zPos[i].getText.asFloat),2)));
 		dist = dist/(~readFactor*10);
-		dist.wait;
-		//0.005.wait;
+		//dist.wait;
+		0.005.wait;
 	}
 }.fork
 )

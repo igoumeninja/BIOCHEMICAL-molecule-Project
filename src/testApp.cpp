@@ -4,7 +4,7 @@
 void testApp::setup(){
 	ofBackground(0, 0, 0, 255);
 	ofSetBackgroundAuto(true);
-	ofEnableBlendMode(OF_BLENDMODE_ADD);
+	ofEnableAlphaBlending();
 	ofSetWindowTitle("biochemical molecule");
 	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 	ofSetVerticalSync(false);
@@ -21,8 +21,13 @@ void testApp::setup(){
 	previousDistance = 0;
 	serial.listDevices();
 	serial.setup("COM6", 57600); // initialize com port
-	shader.load("shaders/noise.vert", "shaders/noise.frag");
-	fbo.allocate(640,480, GL_RGBA32F_ARB);
+	//shader.load("shaders/noise.vert", "shaders/noise.frag");
+	shader.setupShaderFromFile(GL_FRAGMENT_SHADER, "shaders/noise.frag");
+	shader.linkProgram();
+	fbo.allocate(1366,768, GL_RGBA);
+	drawFbo.allocate(1366,768, GL_RGBA);
+	texture.allocate(1366,768, GL_RGBA);
+	ofHideCursor();
 }
 
 //--------------------------------------------------------------
@@ -81,9 +86,9 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	/*fbo.begin();*/
-	//ofClear(255,255,255,0);
-	//shader.begin();
+	//ofEnableBlendMode(OF_BLENDMODE_ADD);
+	fbo.begin();
+	ofClear(0,0,0,1);
 	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,450);
 	ofFill();
 	ofRotateX(rotation.x);
@@ -128,10 +133,27 @@ void testApp::draw(){
 		lastAtomGroup = atom->group;
 	}
 	ofPopMatrix();
-	//shader.end();
-	/*fbo.end();
-	ofSetColor(255,255,255,0);
-	fbo.draw(0,0);*/
+	fbo.end();
+	//ofDisableBlendMode();
+	ofSetColor(255);
+	texture = fbo.getTextureReference();
+
+	drawFbo.begin();
+	ofClear(0,0,0,1);
+		shader.begin();
+			shader.setUniformTexture("tex0", texture, 1);
+			shader.setUniform2f("resolution", 1366 ,768);
+			shader.setUniform1f("time", ofGetElapsedTimef());
+			glBegin(GL_QUADS);  
+				glTexCoord2f(0, 0); glVertex3f(0, 0, 0);  
+				glTexCoord2f(1366, 0); glVertex3f(1366, 0, 0);  
+				glTexCoord2f(1366, 768); glVertex3f(1366, 768, 0);  
+				glTexCoord2f(0,768);  glVertex3f(0,768, 0);  
+			glEnd(); 
+		shader.end();
+	drawFbo.end();
+
+	drawFbo.draw(0,0);
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
