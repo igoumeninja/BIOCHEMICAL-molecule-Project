@@ -65,5 +65,6 @@ class testApp : public ofBaseApp {
 
 	// Shader Stuff
 	ofShader shader;
+	ofFbo fbo;
 
 };

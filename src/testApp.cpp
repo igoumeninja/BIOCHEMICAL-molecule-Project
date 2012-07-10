@@ -22,6 +22,7 @@ void testApp::setup(){
 	serial.listDevices();
 	serial.setup("COM6", 57600); // initialize com port
 	shader.load("shaders/noise.vert", "shaders/noise.frag");
+	fbo.allocate(640,480, GL_RGBA32F_ARB);
 }
 
 //--------------------------------------------------------------
@@ -31,8 +32,8 @@ void testApp::update(){
 	if (!manualRotation) {
 		readSerial();
 	} else {
-		rotation.y = smooth(360*sin((float)ofGetFrameNum()/2000),0.5,rotation.y);
-		rotation.x = smooth(180*cos((float)ofGetFrameNum()/3000),0.5,rotation.x);
+		rotation.y = smooth(360*sin((float)ofGetFrameNum()/2000),0.9,rotation.y);
+		rotation.x = smooth(180*cos((float)ofGetFrameNum()/3000),0.9,rotation.x);
 	}
 	if (lastAtom.id != nil) {
 		goToAtom(lastAtom);
@@ -80,8 +81,10 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	shader.begin();
-	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,300);
+	/*fbo.begin();*/
+	//ofClear(255,255,255,0);
+	//shader.begin();
+	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,450);
 	ofFill();
 	ofRotateX(rotation.x);
 	ofRotateY(rotation.y);
@@ -94,8 +97,8 @@ void testApp::draw(){
 	lastAtomGroup = 0;
 	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
 		if (!manualAlpha){
-			if (atom->tempTransparency < atom->transparency){
-				atom->tempTransparency = atom->tempTransparency + 5;
+			if (atom->tempTransparency > atom->transparency){
+				atom->tempTransparency = atom->tempTransparency - 5;
 			}
 			ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
 		} else {
@@ -104,7 +107,7 @@ void testApp::draw(){
 			if (tempAlpha < 0) tempAlpha = 0;
 			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
 		}
-		//ofSphere(atom->position, atom->displacement+(sin(((float)ofGetFrameNum()/5*atom->displacement/5))*atom->displacement/2));
+		//ofSetColor(255,0,0,128);
 		ofSphere(atom->position, atom->displacement*2);
 		if (atom != atoms.begin()) {
 			int tempAlpha;
@@ -117,7 +120,7 @@ void testApp::draw(){
 
 			//	ofSetColor(255,128,0,128+tempAlpha);
 			} else {
-				ofSetColor(128,255,0,96+tempAlpha);
+				ofSetColor(128,255,0,96+(int)tempAlpha);
 				ofLine(lastAtomPosition,atom->position);
 			}
 		}
@@ -125,7 +128,10 @@ void testApp::draw(){
 		lastAtomGroup = atom->group;
 	}
 	ofPopMatrix();
-	shader.end();
+	//shader.end();
+	/*fbo.end();
+	ofSetColor(255,255,255,0);
+	fbo.draw(0,0);*/
 	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
 }
 
@@ -165,10 +171,6 @@ ofVec3f testApp::calculateRotation(string str) {
 	tempString = tempString.substr(tempPosition+1,tempString.size());
 	tempPosition = tempString.find(",");
 	tempVec.y = -ofToFloat(tempString.substr(0,tempPosition));
-	/*rotationX = smooth(tempVec.x,0.9,rotationX);
-	rotationY = smooth(tempVec.y,0.9,rotationY);
-	rotationZ = smooth(tempVec.z,0.9,rotationZ);
-	return ofVec3f(rotationX,rotationY,rotationZ);*/
 	return ofVec3f(tempVec.x,tempVec.y,tempVec.z);
 	return tempVec;
 }
