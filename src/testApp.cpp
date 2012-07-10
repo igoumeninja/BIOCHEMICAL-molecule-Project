@@ -26,9 +26,9 @@ void testApp::setup(){
 	//shader.load("shaders/noise.vert", "shaders/noise.frag");
 	shader.setupShaderFromFile(GL_FRAGMENT_SHADER, "shaders/noise.frag");
 	shader.linkProgram();
-	fbo.allocate(1366,768, GL_RGBA);
-	drawFbo.allocate(1366,768, GL_RGBA);
-	texture.allocate(1366,768, GL_RGBA);
+	fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGBA);
+	drawFbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGBA);
+	texture.allocate(ofGetWidth(),ofGetHeight(), GL_RGBA);
 	ofHideCursor();
 }
 
@@ -100,8 +100,8 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	//ofEnableBlendMode(OF_BLENDMODE_ADD);
 	fbo.begin();
+	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofClear(0,0,0,1);
 	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,450);
 	ofFill();
@@ -147,8 +147,8 @@ void testApp::draw(){
 		lastAtomGroup = atom->group;
 	}
 	ofPopMatrix();
+	ofDisableBlendMode();
 	fbo.end();
-	//ofDisableBlendMode();
 	ofSetColor(255);
 	texture = fbo.getTextureReference();
 
@@ -156,16 +156,16 @@ void testApp::draw(){
 	ofClear(0,0,0,1);
 		shader.begin();
 			shader.setUniformTexture("tex0", texture, 1);
-			shader.setUniform2f("resolution", 1366 ,768);
+			shader.setUniform2f("resolution", ofGetWidth() ,ofGetHeight());
 			shader.setUniform1i("dissolution", ofRandom(0,5));
 			shader.setUniform1f("time", (1 + (helix*2) + (sheet*2)));
 			shader.setUniform1i("transpose", sheet);
 			//cout << (float)ofGetMouseY()/100 << endl;
 			glBegin(GL_QUADS);  
 				glTexCoord2f(0, 0); glVertex3f(0, 0, 0);  
-				glTexCoord2f(1366, 0); glVertex3f(1366, 0, 0);  
-				glTexCoord2f(1366, 768); glVertex3f(1366, 768, 0);  
-				glTexCoord2f(0,768);  glVertex3f(0,768, 0);  
+				glTexCoord2f(ofGetWidth(), 0); glVertex3f(ofGetWidth(), 0, 0);  
+				glTexCoord2f(ofGetWidth(), ofGetHeight()); glVertex3f(ofGetWidth(), ofGetHeight(), 0);  
+				glTexCoord2f(0,ofGetHeight());  glVertex3f(0,ofGetHeight(), 0);  
 			glEnd(); 
 		shader.end();
 	drawFbo.end();
