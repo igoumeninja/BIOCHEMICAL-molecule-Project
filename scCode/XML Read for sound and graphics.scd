@@ -71,11 +71,10 @@ d = DOMDocument("/Users/stratosbichakis/of_0071_osx_release/apps/myApps/BIOCHEMI
 }.play(RootNode(Server.default), addAction: \addToTail);
 
 
-
 OSCresponder(nil, '/amp', { | time, resp, msg | 
-//	msg[3].postln;
+	msg[3].postln;
 	~amplitude = msg[3];
-//	NetAddr("192.168.1.64", 12345).sendMsg("/amp", msg[3]);
+//	NetAddr("10.10.10.134", 12345).sendMsg("/amp", msg[3]);
 }).add;
 )
 
@@ -113,8 +112,8 @@ SynthDef(\sheet, {|amp = 0.03, pan = 0|
 							)
 		
 }).add;
-a = Synth(\sheet)
-a.free
+//a = Synth(\sheet)
+//a.free
 
 SynthDef(\helix, {|amp = 0.03, pan = 0|
 	Out.ar(0, Pan2.ar(
@@ -122,8 +121,8 @@ SynthDef(\helix, {|amp = 0.03, pan = 0|
 							)
 		
 }).add;
-h = Synth(\helix)
-h.free
+//h = Synth(\helix)
+//h.free
 )
 
 
