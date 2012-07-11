@@ -131,7 +131,7 @@ SynthDef(\helix, {|amp = 0.03, pan = 0|
 {
 	~atomSiteCat.size.do{|i|
 		var amp, freq, index, atomId, dist, seqId, compId, atomSymbol, atomSiteId, secStructBeg, secStructEnd, aminoWeight, aminoAmp;
-	/*
+	
 	n.sendMsg(
 			"atomID", 
 			i.asInt, 
@@ -148,7 +148,7 @@ SynthDef(\helix, {|amp = 0.03, pan = 0|
 			);			
 
 	
-	*/
+	
 		atomSiteId = ~atomSiteCat[i].getAttribute("id").asInteger;
 		atomId = ~atomId[i].getText.asString;
 		compId = ~compId[i].getText.asString;
@@ -317,7 +317,4 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 
 ~readDur = 2;
 ~readFactor = 1;
-(
-~key = 9; 
-n.sendMsg("key", ~key);
-)
+~key = 4;
