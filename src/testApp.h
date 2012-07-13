@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "ofxOsc.h"
-#include "Atom.h"
+#include "AtomController.h"
 #include <list>
 using std::list;
 
@@ -26,6 +26,8 @@ class testApp : public ofBaseApp {
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		void rotateAround();
+		void getOscMessages();
 		void readSerial();
 		float smooth(float data, float smoothVal, float smoothedData);
 		void goToAtom(Atom atom);
@@ -59,11 +61,9 @@ class testApp : public ofBaseApp {
 	int sheet;
 	int alpha;
 
-	list<Atom> atoms;
-	Atom lastAtom;
-	ofVec3f lastAtomPosition;
-	int lastAtomGroup;
 
+	AtomController atomController;
+	Atom lastAtom;
 
 	// Shader Stuff
 	ofShader shader;

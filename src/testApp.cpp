@@ -2,53 +2,68 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
-	ofBackground(0, 0, 0, 255);
-	ofSetBackgroundAuto(true);
-	ofEnableAlphaBlending();
-	ofSetWindowTitle("biochemical molecule");
-	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
-	ofSetVerticalSync(false);
 
-	manualAlpha = false;
-	manualRotation = true;
+	//Setup OpenFrameworks stuff
+	ofBackground(0, 0, 0, 255);
+	ofEnableAlphaBlending();
+	ofSetWindowTitle("Biochemical Molecule Sonification Project");
+	ofSetFrameRate(60);
+	ofSetVerticalSync(false);
+	ofSetSphereResolution(8);
+	ofHideCursor();
+
+	//Setup the booleans
+	manualAlpha = false; //When true, the overall alpha can be controlled manually
+	manualRotation = false; //When true, the camera rotation is defined by the 9dof, when false the rotation is automatic
 	sheet = 0;
 	helix = 0;
 
-	cout << "listening for osc messages on port " << PORT << "\n";
+
+	//Setup the serial port that will receive data from the 9dof
+	serial.setup("COM6", 57600);
+	//Setup the osc receiver
 	receiver.setup(PORT);
-	ofSetSphereResolution(8);
-	//ofEnableSmoothing();
-	//camPosition = ofVec3f(ofGetWidth()/2, ofGetHeight()/2, -200);
+	
+	//Camera distance from the atoms
 	distance = 0;
 	previousDistance = 0;
-	serial.listDevices();
-	serial.setup("COM6", 57600); // initialize com port
-	//shader.load("shaders/noise.vert", "shaders/noise.frag");
+
+	//Setup the effect shader
 	shader.setupShaderFromFile(GL_FRAGMENT_SHADER, "shaders/noise.frag");
 	shader.linkProgram();
+	
+	//Allocate the texture and the fbos
 	fbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGBA);
 	drawFbo.allocate(ofGetWidth(),ofGetHeight(), GL_RGBA);
 	texture.allocate(ofGetWidth(),ofGetHeight(), GL_RGBA);
-	ofHideCursor();
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
 
-	//read serial
-	if (!manualRotation) {
-		readSerial();
-	} else {
-		rotation.y = smooth(360*sin((float)ofGetFrameNum()/2000),0.9,rotation.y);
-		rotation.x = smooth(180*cos((float)ofGetFrameNum()/3000),0.9,rotation.x);
-	}
-	if (lastAtom.id != nil) {
+	rotateAround(); // Calculate rotation
+
+	if (lastAtom.id != nil) { // Move to last created atom, if an atom has been created
 		goToAtom(lastAtom);
 	}
 
-	//calculate alpha
-	alpha = (((float)ofGetMouseX()/(float)ofGetWidth())*128) -64;
 
+	alpha = (((float)ofGetMouseX()/(float)ofGetWidth())*128) -64; //calculate alpha
+
+	getOscMessages(); // Get any incoming Osc messages
+
+}
+
+void testApp::rotateAround(){ 
+	if (manualRotation) {
+		readSerial(); //rotate using the 9dof
+	} else {
+		rotation.y = smooth(360*sin((float)ofGetFrameNum()/2000),0.9,rotation.y);	//slowly rotate back and forth 
+		rotation.x = smooth(180*cos((float)ofGetFrameNum()/3000),0.9,rotation.x);	//in x and y axes
+	}
+}
+
+void testApp::getOscMessages(){
 	// check for waiting messages
 	while(receiver.hasWaitingMessages()){
 		// get the next message
@@ -68,25 +83,25 @@ void testApp::update(){
 				camPosition = ofVec3f(posX,posY,posZ);
 			}			
 			lastAtom = Atom(atomID,ofVec3f(posX,posY,posZ),bIso,type_symbol,groupID,acid);
-			atoms.push_back(lastAtom);
-		} else if (m.getAddress() == "zoom") {
+			atomController.addAtom(lastAtom);
+		} else if (m.getAddress() == "zoom") { //remotely zoom in or out
 			float tempDistance = m.getArgAsInt32(0);
 			distance = smooth(tempDistance, 0.95, previousDistance);
 			previousDistance = distance;
-		} else if (m.getAddress() == "manualmode") {
+		} else if (m.getAddress() == "manualmode") { //remotely enable or disable manual rotation
 			int tempManMode = m.getArgAsInt32(0);
 			if (tempManMode == 0) {
 				manualRotation = false;
 			} else {
 				manualRotation = true;
 			}
-		} else if (m.getAddress() == "isSheet") {
+		} else if (m.getAddress() == "isSheet") { //set a variable for using to create an effect when drawing with the shader
 			if (m.getArgAsInt32(0) == 1) {
 				sheet = 1;
 			} else {
 				sheet = 0;
 			}
-		} else if (m.getAddress() == "isHelix") {
+		} else if (m.getAddress() == "isHelix") { //set a variable for using to create an effect when drawing with the shader
 			if (m.getArgAsInt32(0) == 1) {
 				helix = 1;
 			} else {
@@ -96,108 +111,73 @@ void testApp::update(){
 
 	}
 }
-
-
 //--------------------------------------------------------------
 void testApp::draw(){
-	fbo.begin();
-	ofEnableBlendMode(OF_BLENDMODE_ADD);
+	fbo.begin(); //First, we draw the scene completely inside the fbo.
+	ofEnableBlendMode(OF_BLENDMODE_ADD); //Using OF_BLENDMODE_ADD for an aesthetically pleasing effect.
 	ofClear(0,0,0,1);
 	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,450);
 	ofFill();
+
 	ofRotateX(rotation.x);
 	ofRotateY(rotation.y);
 	ofRotateZ(rotation.z);
-	ofPushMatrix();
-	ofTranslate(-camPosition);
 	
-	ofSetColor(0,0,0,1);
-	lastAtomPosition = ofVec3f(0,0,0);
-	lastAtomGroup = 0;
-	for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++){
-		if (!manualAlpha){
-			if (atom->tempTransparency > atom->transparency){
-				atom->tempTransparency = atom->tempTransparency - 5;
-			}
-			ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
-		} else {
-			int tempAlpha = alpha + atom->color.a;
-			if (tempAlpha > 255) tempAlpha = 255;
-			if (tempAlpha < 0) tempAlpha = 0;
-			ofSetColor(atom->color.r,atom->color.g,atom->color.b,tempAlpha);
-		}
-		//ofSetColor(255,0,0,128);
-		ofSphere(atom->position, atom->displacement*2);
-		if (atom != atoms.begin()) {
-			int tempAlpha;
-			if (manualAlpha) {
-				tempAlpha = alpha;
-			} else {
-				tempAlpha = 0;
-			}
-			if (atom->group != lastAtomGroup) {
-
-			//	ofSetColor(255,128,0,128+tempAlpha);
-			} else {
-				ofSetColor(128,255,0,96+(int)tempAlpha);
-				ofLine(lastAtomPosition,atom->position);
-			}
-		}
-		lastAtomPosition = atom->position;
-		lastAtomGroup = atom->group;
-	}
+	ofPushMatrix();
+		ofTranslate(-camPosition);		//Moving the "camera"
+		ofSetColor(0,0,0,1);
+		atomController.draw();			// Drawing the atoms
 	ofPopMatrix();
 	ofDisableBlendMode();
-	fbo.end();
+	fbo.end();							// End drawing to the fbo.
 	ofSetColor(255);
-	texture = fbo.getTextureReference();
-
-	drawFbo.begin();
+	
+	texture = fbo.getTextureReference();// Using the fbo as a texture for the shader
+	drawFbo.begin();					//Start drawing inside drawFbo
 	ofClear(0,0,0,1);
-		shader.begin();
-			shader.setUniformTexture("tex0", texture, 1);
+		shader.begin();					//Beginning shading
+			shader.setUniformTexture("tex0", texture, 1);//Setting the texture for use inside the shader
 			shader.setUniform2f("resolution", ofGetWidth() ,ofGetHeight());
 			shader.setUniform1i("dissolution", ofRandom(0,5));
 			shader.setUniform1f("time", (1 + (helix*2) + (sheet*2)));
 			shader.setUniform1i("transpose", sheet);
-			//cout << (float)ofGetMouseY()/100 << endl;
-			glBegin(GL_QUADS);  
+			glBegin(GL_QUADS);			//Creating a rectangle to draw the shaded texture into.
 				glTexCoord2f(0, 0); glVertex3f(0, 0, 0);  
 				glTexCoord2f(ofGetWidth(), 0); glVertex3f(ofGetWidth(), 0, 0);  
 				glTexCoord2f(ofGetWidth(), ofGetHeight()); glVertex3f(ofGetWidth(), ofGetHeight(), 0);  
 				glTexCoord2f(0,ofGetHeight());  glVertex3f(0,ofGetHeight(), 0);  
 			glEnd(); 
-		shader.end();
-	drawFbo.end();
+		shader.end();					//Finish shading
+	drawFbo.end();						//Finish drawing inside the drawFbo
 
-	drawFbo.draw(0,0);
-	ofSetWindowTitle("biochemical molecule " + ofToString(ofGetFrameRate()));
+	drawFbo.draw(0,0);		//Finally we draw the drawFbo
+
+	ofSetWindowTitle("Biochemical Molecule Sonification Project " + ofToString(ofGetFrameRate())); // Displaying the framerate
 }
 
-void testApp::goToAtom(Atom atom) {
+void testApp::goToAtom(Atom atom) { //Smoothly move the camera to each newly created atom
 	camPosition = ofVec3f(smooth(atom.position.x,0.99,camPosition.x),smooth(atom.position.y,0.99,camPosition.y),smooth(atom.position.z,0.99,camPosition.z));
 }
 
 void testApp::readSerial() {
 		int nRead  = 0; 
 		unsigned char bytesReturned[1];
-		char		bytesRead[1];				// data from serial, we will be trying to read 3
-		char		bytesReadString[2];			// a string needs a null terminator, so we need 3 + 1 bytes
+		char		bytesRead[1];				
+		char		bytesReadString[2];	
 		memset(bytesReadString, 0, 2);
 		memset(bytesReturned, 0, 1);
-		while( (nRead = serial.readBytes( bytesReturned, 1)) > 0){
+		while( (nRead = serial.readBytes( bytesReturned, 1)) > 0){ //We read the serial byte by byte
 			memcpy(bytesReadString, bytesReturned, 1);
-			if (ofToString(bytesReadString) != "\n") {
+			if (ofToString(bytesReadString) != "\n") {		//If the byte received is not an endl we add the byte to serialData string.
 				serialData += bytesReadString;
-			} else {
-				rotation = calculateRotation(serialData);
-				cout << rotation << endl;
-				serialData = "";
+			} else {										//When we reach the end of line 
+				rotation = calculateRotation(serialData);	//we send the data to calculateRotation() and assign the result to rotation
+				serialData = "";							//and empty it.
 			}
 		};
 }
 
-ofVec3f testApp::calculateRotation(string str) {
+ofVec3f testApp::calculateRotation(string str) {  //Here we split the data received to x-y-z rotations and return a 3d vector 
 	ofVec3f tempVec;
 	string tempString;
 	int tempPosition = str.find(":");
@@ -234,23 +214,20 @@ void testApp::keyPressed(int key){
 
 		case 'C':
 		case 'c':
-			for (list<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); atom++) {
-				atom = atoms.erase(atom);
-			}
+			atomController.clear(); //Erase all atoms.
 	}
 }
 
-float testApp::smooth(float data, float filterVal, float smoothedData) {
-	if (filterVal > 1){
-		filterVal = .99;
-	}
+float testApp::smooth(float data, float filterVal, float smoothedData) {//Smoothing function for smooth transition
+	if (filterVal > 1){													//between two values. Taken from:
+		filterVal = .99;												//http://arduino.cc/playground/Main/Smooth
+	}																	//By Paul Badger
 	else if (filterVal <= 0){
 		filterVal = 0;
 	}
+	smoothedData = (data * (1 - filterVal)) + (smoothedData  *  filterVal);
 
-  smoothedData = (data * (1 - filterVal)) + (smoothedData  *  filterVal);
-
-  return smoothedData;
+	return smoothedData;
 }
 
 //--------------------------------------------------------------
