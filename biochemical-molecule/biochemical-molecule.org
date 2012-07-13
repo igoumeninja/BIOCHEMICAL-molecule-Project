@@ -13,6 +13,7 @@
 Σε δεύτερο επίπεδο η επεξεργασία και τροποποίηση των δεδομένων, μπορεί να προσφέρει στον ακροατή μία νέα "εμπειρική" σχέση με τη φύση, η οποία του είναι πιο οικεία. Η παρατήρηση μίας περίπλοκης δομής μπορεί, όταν συνδυαστεί με ένα ακουστικό σήμα, να γίνει πιο αντιληπτή.
 
 - [[http://www.rcsb.org/pdb/explore/explore.do?structureId=3spx][Crystal structure of O-Acetyl Serine Sulfhydrylase from Leishmania donovani]]
+- [[http://en.wikipedia.org/wiki/Transferase][Transferase]]
 
 Ο ιστόσελίδα του project βρίσκεται στο ιστότοπο του σεμηναρίου: http://extending.earlab.org/projects/Stratos-Bichakis/biochemical-molecule.html
 
@@ -42,19 +43,26 @@ https://trello.com/card/sonification-and-3d-model-construction-on-a-biochemical-
 - [[http://www.sparkfun.com/products/10736][Sparkfun 9DOF]]
 - Arduino with Infrared Proximity Sensor
 * Documentation
-** <2012-07-06 Fri>
+#+begin_center
+** 2012-07-06 Fri
 #+begin_html
 <iframe width="420" height="315" src="http://www.youtube.com/embed/giVsxAj7S4A" frameborder="0" allowfullscreen></iframe>
 #+end_html
-** <2012-07-07 Sat>
+** 2012-07-07 Sat
 
 #+begin_html
 <iframe width="420" height="315" src="http://www.youtube.com/embed/UkSchI7T3mE" frameborder="0" allowfullscreen></iframe>
 
 #+end_html
-** <2012-07-09 Mon>
+** 2012-07-09 Mon
 
 #+begin_html
 <iframe width="100%" height="166" scrolling="no" frameborder="no" src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F52217440&show_artwork=true"></iframe>
 #+end_html
 
+** 2012-07-09 Tue
+#+begin_html
+<iframe width="420" height="315" src="http://www.youtube.com/embed/yhCc_Lsa7ss" frameborder="0" allowfullscreen></iframe>
+#+end_html
+
+#+end_center
