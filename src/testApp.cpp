@@ -18,12 +18,12 @@ void testApp::setup(){
 	sheet = 0;
 	helix = 0;
 
-
+	
 	//Setup the serial port that will receive data from the 9dof
-	serial.setup("COM6", 57600);
+	//serial.setup("COM6", 57600);
 	//Setup the osc receiver
 	receiver.setup(PORT);
-	
+	sender.setup("127.0.0.1",57120);
 	//Camera distance from the atoms
 	distance = 0;
 	previousDistance = 0;
@@ -114,27 +114,28 @@ void testApp::getOscMessages(){
 //--------------------------------------------------------------
 void testApp::draw(){
 	fbo.begin(); //First, we draw the scene completely inside the fbo.
-	ofEnableBlendMode(OF_BLENDMODE_ADD); //Using OF_BLENDMODE_ADD for an aesthetically pleasing effect.
-	ofClear(0,0,0,1);
-	ofTranslate(ofGetWidth()/2,ofGetHeight()/2,450);
-	ofFill();
+		ofEnableBlendMode(OF_BLENDMODE_ADD); //Using OF_BLENDMODE_ADD for an aesthetically pleasing effect.
+		//ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+		ofClear(0,0,0,0);
+		ofTranslate(ofGetWidth()/2,ofGetHeight()/2,450);
+		// ofFill();
 
-	ofRotateX(rotation.x);
-	ofRotateY(rotation.y);
-	ofRotateZ(rotation.z);
+		ofRotateX(rotation.x);
+		ofRotateY(rotation.y);
+		ofRotateZ(rotation.z);
 	
-	ofPushMatrix();
-		ofTranslate(-camPosition);		//Moving the "camera"
-		ofSetColor(0,0,0,1);
-		atomController.draw();			// Drawing the atoms
-	ofPopMatrix();
-	ofDisableBlendMode();
+		ofPushMatrix();
+			ofTranslate(-camPosition);		//Moving the "camera"
+			ofSetColor(0,0,0,0.5);
+			atomController.draw();			// Drawing the atoms
+		ofPopMatrix();
+		ofDisableBlendMode();
 	fbo.end();							// End drawing to the fbo.
 	ofSetColor(255);
 	
 	texture = fbo.getTextureReference();// Using the fbo as a texture for the shader
 	drawFbo.begin();					//Start drawing inside drawFbo
-	ofClear(0,0,0,1);
+	//ofClear(0,0,0,1);
 		shader.begin();					//Beginning shading
 			shader.setUniformTexture("tex0", texture, 1);//Setting the texture for use inside the shader
 			shader.setUniform2f("resolution", ofGetWidth() ,ofGetHeight());
@@ -215,6 +216,12 @@ void testApp::keyPressed(int key){
 		case 'C':
 		case 'c':
 			atomController.clear(); //Erase all atoms.
+
+		case 'S':
+		case 's':
+			ofxOscMessage m;
+			m.setAddress("start");
+			sender.sendMessage(m);
 	}
 }
 

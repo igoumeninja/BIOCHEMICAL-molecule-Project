@@ -35,7 +35,7 @@ class testApp : public ofBaseApp {
 
 
 		ofxOscReceiver receiver;
-
+		ofxOscSender sender;
 		ofVec3f rotation;
 		float rotationX;
 		float rotationY;

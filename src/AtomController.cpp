@@ -16,11 +16,31 @@ void AtomController::draw() {
 			atom->tempTransparency = atom->tempTransparency - 5;//and fade out till they reach their normal transparency
 		}
 		ofSetColor(atom->color.r, atom->color.g,atom->color.b, atom->tempTransparency);
-		ofSphere(atom->position, atom->displacement*2); 
+		ofVec3f position = atom->position;
+
+		position.x = position.x + cos(ofGetElapsedTimef()*sqrt(2*atom->displacement));
+		position.y = position.y + sin(ofGetElapsedTimef()*sqrt(2*atom->displacement));
+		position.z = position.z + 0.5*cos(-ofGetElapsedTimef()*sqrt(2*atom->displacement)) + 0.5*sin(-ofGetElapsedTimef()*sqrt(2*atom->displacement));
+
+		ofSphere(position, atom->displacement*2); 
 		if (atom != atoms.begin() && atom->group == lastAtomGroup) {
 			ofSetColor(128,255,0,96);  //Connect atoms belonging to the same
 			ofLine(lastAtomPosition,atom->position);
 		}
+
+		if (atom != atoms.begin() && atom->group != lastAtomGroup) {
+			ofSetColor(231,245,152,96);
+			ofSetLineWidth(10.0);
+			ofLine(lastAcidPosition, atom->position);
+			ofSetColor(231,245,152,60);
+			ofSphere(atom->position,1.5);
+			ofSetLineWidth(1.0);
+		}
+
+		if (atom->group != lastAtomGroup) {
+			lastAcidPosition = atom->position;
+		}
+
 		lastAtomPosition = atom->position;
 		lastAtomGroup = atom->group;
 	}

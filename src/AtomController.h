@@ -10,5 +10,6 @@ class AtomController {
 		void clear();
 
 		ofVec3f lastAtomPosition;
+		ofVec3f lastAcidPosition;
 		int lastAtomGroup;
 };
