@@ -30,7 +30,7 @@ f[0].getText
 */
 
 // Store the document in variable d
-n = NetAddr("192.168.2.107", 12345);
+n = NetAddr("10.0.1.2", 12345);
 d = DOMDocument("/Users/stratosbichakis/Documents/SuperCollider files/BIOCHEMICAL-molecule-Project/3SPX.xml");
 
 (
@@ -60,9 +60,14 @@ d = DOMDocument("/Users/stratosbichakis/Documents/SuperCollider files/BIOCHEMICA
 ~readFactor = 1; ~readDur = 2;
 ~key = 4;
 ~atomSynths = Array.newClear(~atomSiteCat.size);
+~helixSynths = Array.newClear(~atomSiteCat.size);
 ~sheetSynth = nil; ~helixSynth = nil;
 ~isSheet = 0; ~isHelix = 0;
 ~pan = 0;
+~atomlevel = 1;
+~aminlevel = 1;
+~sheetlevel = 1;
+~helixlevel = 1;
 )
 
 /*
@@ -82,7 +87,7 @@ OSCresponder(nil, '/amp', { | time, resp, msg |
 
 (
 
-SynthDef(\atom, {|amp = 0.1, pan =0, freq = 400, index = 5, modamp = 2.5, readFactor = 1, readDur = 1, sheet = 0, helix = 0 |
+SynthDef(\atom, {|amp = 0.1, pan =0, freq = 400, index = 5, modamp = 2.5, readFactor = 1, readDur = 1, sheet = 0, helix = 0 ,level = 1|
 	var op1, op2, op2_amp_env, op2_amp_lfo, op1_amp_env;
 
 	op2_amp_env =  -300*sheet;
@@ -90,7 +95,7 @@ SynthDef(\atom, {|amp = 0.1, pan =0, freq = 400, index = 5, modamp = 2.5, readFa
 	op2 = SinOsc.ar((freq*index), 0, modamp*(amp*2000)+op2_amp_lfo+op2_amp_env);
 	op1_amp_env = EnvGen.kr(Env.sine(readDur*100*amp/(10.pow(readFactor)), amp/10), doneAction: 2);
 	op1 = SinOsc.ar(freq+op2, 0, op1_amp_env);
-	Out.ar(0, Pan2.ar(op1, pan));
+	Out.ar(0, level*Pan2.ar(op1, pan));
 
 }).add;
 
@@ -98,8 +103,8 @@ SynthDef(\atom, {|amp = 0.1, pan =0, freq = 400, index = 5, modamp = 2.5, readFa
 
 
 
-SynthDef(\aminoAcid, {|amp = 0.2, pan = 0, freq = 42, readFactor = 1|
-	Out.ar(0, Pan2.ar(
+SynthDef(\aminoAcid, {|amp = 0.2, pan = 0, freq = 42, readFactor = 1, level=1|
+	Out.ar(0, level*Pan2.ar(
 						SinOsc.ar(freq+SinOsc.ar(freq*2.3, 0, 100*amp),
 						0,
 						EnvGen.kr(
@@ -107,23 +112,23 @@ SynthDef(\aminoAcid, {|amp = 0.2, pan = 0, freq = 42, readFactor = 1|
 		)
 }).add;
 
-SynthDef(\sheet, {|amp = 0.03, pan = 0|
-	Out.ar(0, Pan2.ar(
-						Resonz.ar(WhiteNoise.ar(amp*EnvGen.kr(Env([0, 1], [2], 0))), XLine.kr(3000, 600, 15), Line.kr(0.1, 0.01, 10 ) ),pan)
+SynthDef(\sheet, {|amp = 0.03, pan = 0, level = 1|
+	Out.ar(0, level*Pan2.ar(
+						Resonz.ar(PinkNoise.ar(amp*EnvGen.kr(Env([0, 1], [2], 0))), XLine.kr(3000, 600, 15), Line.kr(0.1, 0.01, 10), 0.5 ),pan)
 							)
 
 }).add;
-//a = Synth(\sheet)
-//a.free
+//a = Synth(\sheet);
+//a.free;
 
-SynthDef(\helix, {|amp = 0.03, pan = 0|
-	Out.ar(0, Pan2.ar(
-						Resonz.ar(WhiteNoise.ar(amp*EnvGen.kr(Env([0, 1 ], [0.5], 0))), SinOsc.kr(0.88, 0, 300, 2600), 0.1), pan)
+SynthDef(\helix, {|amp = 0.03, pan = 0, level = 1|
+	Out.ar(0, 0*Pan2.ar(
+						Resonz.ar(PinkNoise.ar(amp*EnvGen.kr(Env([0, 1 ], [0.5], 0))), SinOsc.kr(0.88, 0, 340, 1600), 0.3, 0.2), pan)
 							)
 
 }).add;
-//h = Synth(\helix)
-//h.free
+//h = Synth(\helix);
+//h.free;
 )
 
 
@@ -211,7 +216,7 @@ SynthDef(\helix, {|amp = 0.03, pan = 0|
 
 			"O3", {freq = (~key + 24 + 15.9994).midicps},
 			"OG", {freq = (~key + 12 + 15.9994).midicps},
-			"OH", {freq = (~key + 24 + 15.9994).midicps},
+			"OH", {freq = (~key + 60 + 15.9994).midicps},
 			"OG1", {freq = (~key + 48 + 15.9994).midicps},
 			"OG2", {freq = (~key + 24 + 15.9994).midicps},
 			"OD1", {freq = (~key + 60 + 15.9994).midicps},
@@ -224,7 +229,7 @@ SynthDef(\helix, {|amp = 0.03, pan = 0|
 			"OP4", {freq = (~key + 36 + 15.9994).midicps},
 
 			"SD", {freq = (~key + 60 + 32.065).midicps},
-			"SG", {freq = (~key + 24 + 32.065).midicps},
+			"SG", {freq = (~key + 48 + 32.065).midicps},
 
 					{freq = (~key + 24 + 15.9994).midicps; [atomId, compId].postln});
 
@@ -251,7 +256,7 @@ aminoWeight = ~compWeight[~chemCompCat.detectIndex(
 
 aminoAmp = 0.6*aminoWeight/~compWeightMax;
 
-Synth(\aminoAcid, [\amp, aminoAmp]);
+Synth(\aminoAcid, [\amp, aminoAmp, \level, ~aminlevel]);
 
 						// Determine the secondary structure
 
@@ -259,7 +264,7 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 
 				if( ~sheetBeg.includes(seqId),
 							{"SheetBeginning".postln;
-							~sheetSynth = Synth(\sheet);
+							~sheetSynth = Synth(\sheet, [\level, ~sheetlevel]);
 							~isSheet = 1;
 							n.sendMsg("isSheet", ~isSheet);
 								~key = [ 6, 11].choose;
@@ -279,17 +284,17 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 				if( ~helixBeg.includes(seqId),
 							{"HelixBeginning".postln;
 
-							~helixSynth = Synth(\helix);
+								~helixSynths[i] = Synth(\helix, [\level, ~helixlevel]);
 							~isHelix = 1;
 							n.sendMsg("isHelix", ~isHelix);
-								~key = [3, 9].choose ;
+							~key = [3, 9].choose ;
 							}
 						);
 
 				if( ~helixEnd.includes(seqId),
 							{"HelixEnd".postln;
 
-							~helixSynth.free;
+							~helixSynths.do(_.free);
 							~isHelix = 0;
 							n.sendMsg("isHelix", ~isHelix);
 							~key = 4;
@@ -303,22 +308,76 @@ Synth(\aminoAcid, [\amp, aminoAmp]);
 		};
 		);
 
-			~atomSynths[i] = Synth(\atom, [\readFactor, ~readFactor, \readDur, ~readDur, \amp, amp, \pan, ~pan, \freq, freq, \sheet, ~isSheet, \helix, ~isHelix]);
+			~atomSynths[i] = Synth(\atom, [\readFactor, ~readFactor, \readDur, ~readDur, \amp, amp, \pan, ~pan, \freq, freq, \sheet, ~isSheet, \helix, ~isHelix, \level, ~atomlevel]);
 
 
 		// Calculate the distance between two atoms
+		if(i<~atomSiteCat.size,{
 		dist = (sqrt(
 			pow((~xPos[i+1].getText.asFloat	- ~xPos[i].getText.asFloat),2) +
 			pow((~yPos[i+1].getText.asFloat	- ~yPos[i].getText.asFloat),2) +
 			pow((~zPos[i+1].getText.asFloat	- ~zPos[i].getText.asFloat),2)));
 		dist = dist/(~readFactor*10);
 	dist.wait;
+		},{5.wait;})
 
-
-	}
+	};
+	~sheetSynth.free;
+	~helixSynths.do(_.free);
+	~atomSynths.do(_.free);
 }.fork
 )
-
+// For performance
+(
 ~readDur = 2;
 ~readFactor = 1;
-~key = 4;
+)
+
+
+// For informational purposes
+(
+~readDur = 0.03;
+~readFactor = 1.5;
+)
+(
+~atomlevel = 1;
+~aminlevel = 1;
+~sheetlevel = 1;
+~helixlevel = 1;
+)
+
+(
+var window, slider1, slider2, slider3, slider4, slider5, slider6, levelspec,durspec, readspec;
+
+levelspec = ControlSpec(0, 2, \lin, 0.01, 1);
+durspec = ControlSpec(0, 2, \lin, 0.01, 1);
+readspec = ControlSpec(0.3, 2, \lin, 0.01, 1);
+
+window = Window.new("Levels", Rect(600, 200, 170, 330));
+
+slider1 = Slider(window, Rect(10, 10, 30, 230))
+.action_({ ~atomlevel = levelspec.map(slider1.value);})
+			.value_(0.5);
+
+slider2 = Slider(window, Rect(50, 10, 30, 230))
+.action_({ ~aminlevel = levelspec.map(slider2.value);})
+			.value_(0.5);
+
+slider3 = Slider(window, Rect(90, 10, 30, 230))
+.action_({ ~sheetlevel = levelspec.map(slider3.value);})
+			.value_(0.5);
+
+slider4 = Slider(window, Rect(130, 10, 30, 230))
+.action_({ ~helixlevel = levelspec.map(slider4.value);})
+			.value_(0.5);
+
+slider5 = Slider(window, Rect(10, 250, 150, 30))
+			.action_({ ~readDur = durspec.map(slider5.value);})
+.value_(0.5);
+
+slider6 = Slider(window, Rect(10, 290, 150, 30))
+			.action_({ ~readFactor = durspec.map(slider6.value);})
+.value_(0.5);
+
+window.front;
+)
